@@ -604,7 +604,7 @@
 
             const fakturCheckbox = document.getElementById('fakturCheckbox');
             const fakturLabel = document.getElementById('fakturLabel');
-            if (rowData.faktur === 'ADA FAKTUR') {
+            if (rowData.faktur === true || String(rowData.faktur).toUpperCase() === 'TRUE' || rowData.faktur === 'ADA FAKTUR') {
                 fakturCheckbox.checked = true;
                 fakturLabel.innerText = 'Ada Faktur';
                 fakturLabel.className = 'text-xs sm:text-sm font-extrabold text-emerald-600 transition-colors duration-300';
@@ -664,7 +664,7 @@
             const keepData = document.getElementById('keepDataCheck').checked;
             
             const isFakturChecked = document.getElementById('fakturCheckbox').checked;
-            data.faktur = isFakturChecked ? 'ADA FAKTUR' : '-';
+            data.faktur = isFakturChecked; // Mengirim boolean true/false agar Spreadsheet menampilkan Checkbox
 
             const isEditing = currentEditRowIndex !== null;
             const loadingText = isEditing ? 'Memperbarui data di Spreadsheet...' : 'Menyandikan laporan ke Spreadsheet...';
@@ -771,7 +771,7 @@
                 (r.tanggalTampil || '').toLowerCase().includes(term) ||
                 (r.grup || '').toLowerCase().includes(term) ||
                 (r.kategori || '').toLowerCase().includes(term) ||
-                (r.faktur || '').toLowerCase().includes(term)
+                (String(r.faktur) || '').toLowerCase().includes(term)
             );
             renderHistoryTable(filtered);
         }
