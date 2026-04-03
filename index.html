@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ReturHub Enterprise</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        /* CSS RESET & OVERFLOW FIX UNTUK MOBILE */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        
+        html, body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #f1f5f9;
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Blobs */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.4;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+        .blob-1 { background: #c7d2fe; width: 400px; height: 400px; top: -100px; left: -100px; }
+        .blob-2 { background: #e9d5ff; width: 350px; height: 350px; bottom: -50px; right: -50px; animation-delay: -5s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
+        }
+
+        /* Custom Dropdown Styling */
+        .custom-select-container { position: relative; width: 100%; max-width: 100%; }
+        .custom-select-options {
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 999;
+            display: none;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform-origin: top;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: scaleY(0.95);
+            border: 1px solid #e2e8f0;
+            width: 100%;
+            left: 0;
+            right: 0;
+        }
+        .custom-select-options.active { 
+            display: block; 
+            opacity: 1;
+            transform: scaleY(1);
+        }
+
+        /* Focus Glow */
+        input:focus, select:focus, textarea:focus {
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+            border-color: #6366f1 !important;
+        }
+
+        /* Custom Scrollbar */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Tab Transitions */
+        .tab-content { display: none; animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; width: 100%; max-width: 100%; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Glassmorphism */
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.8); }
+
+        /* Loading Screen Animation */
+        @keyframes loadingProgress {
+            0% { transform: translateX(-150%); }
+            100% { transform: translateX(250%); }
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+    <!-- Premium Full-Screen Loader -->
+    <div id="premiumLoader" class="fixed inset-0 z-[9999] bg-slate-900 flex flex-col items-center justify-center transition-all duration-700 ease-in-out w-full h-full">
+        <div class="relative flex flex-col items-center max-w-full px-4">
+            <div class="absolute inset-0 bg-indigo-500 blur-[100px] opacity-40 rounded-full w-48 h-48 animate-pulse mx-auto mt-10"></div>
+            <div class="relative w-28 h-28 mb-8">
+                <svg class="absolute inset-0 w-full h-full text-indigo-600 animate-[spin_1.5s_linear_infinite]" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                    <path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center bg-slate-800 rounded-full m-2 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]">
+                    <i class="ph-fill ph-rocket-launch text-4xl text-indigo-400 animate-bounce"></i>
+                </div>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-2 tracking-tight text-center">Retur<span class="text-indigo-400">Hub</span></h2>
+            <p class="text-slate-400 font-medium mb-10 text-xs sm:text-sm tracking-widest animate-pulse text-center">MENYINKRONKAN DATA ENTERPRISE...</p>
+            <div class="w-64 max-w-full h-1.5 bg-slate-800 rounded-full overflow-hidden relative">
+                <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 w-1/2 rounded-full" style="animation: loadingProgress 1.5s ease-in-out infinite;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Decorative Backgrounds -->
+    <div class="blob blob-1 hidden md:block"></div>
+    <div class="blob blob-2 hidden md:block"></div>
+
+    <!-- Floating Navigation Bar -->
+    <nav class="sticky top-0 sm:top-4 z-[100] max-w-5xl mx-auto px-0 sm:px-6 lg:px-8 mb-4 sm:mb-8 w-full">
+        <div class="glass-card rounded-none sm:rounded-2xl shadow-lg shadow-indigo-100/40 flex flex-col md:flex-row md:justify-between items-start md:items-center p-3 md:p-3 transition-all duration-300 gap-3 w-full max-w-full box-border">
+            <div class="flex items-center gap-3 px-2 w-full md:w-auto shrink-0">
+                <div class="p-2 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-xl shadow-md">
+                    <i class="ph-bold ph-arrows-left-right text-white text-xl"></i>
+                </div>
+                <span class="font-extrabold text-xl tracking-tight text-slate-800">Retur<span class="text-indigo-600">Hub</span></span>
+            </div>
+            
+            <div class="flex space-x-1.5 sm:space-x-2 bg-slate-100/70 p-1 sm:p-1.5 rounded-xl w-full md:w-auto overflow-x-auto hide-scrollbar snap-x box-border">
+                <button onclick="switchTab('input')" id="tab-input" class="nav-btn shrink-0 sm:flex-1 md:flex-none flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 rounded-lg text-[12px] sm:text-sm font-bold bg-white text-indigo-600 shadow-sm transition-all whitespace-nowrap snap-center min-w-0">
+                    <i class="ph-bold ph-pencil-simple text-base sm:text-lg"></i> Form Input
+                </button>
+                <button onclick="switchTab('display')" id="tab-display" class="nav-btn shrink-0 sm:flex-1 md:flex-none flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 rounded-lg text-[12px] sm:text-sm font-semibold text-slate-500 hover:text-indigo-600 hover:bg-white/70 transition-all whitespace-nowrap snap-center min-w-0">
+                    <i class="ph-bold ph-table text-base sm:text-lg"></i> Database
+                </button>
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-btn shrink-0 sm:flex-1 md:flex-none flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 rounded-lg text-[12px] sm:text-sm font-semibold text-slate-500 hover:text-indigo-600 hover:bg-white/70 transition-all whitespace-nowrap snap-center min-w-0">
+                    <i class="ph-bold ph-chart-pie-slice text-base sm:text-lg"></i> Analitik
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto pb-12 px-3 sm:px-6 lg:px-8 w-full max-w-[100vw] box-border overflow-x-hidden">
+        
+        <!-- Tab 1: Form Input -->
+        <div id="content-input" class="tab-content active w-full box-border">
+            <div class="glass-card rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl relative z-10 border border-white sm:overflow-visible w-full max-w-full box-border">
+                
+                <div class="rounded-t-[1.5rem] sm:rounded-t-[2rem] overflow-hidden bg-slate-900 relative p-5 sm:p-8 md:p-10 w-full max-w-full box-border">
+                    <div class="relative z-10">
+                        <h2 id="formTitle" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">Formulir Retur</h2>
+                        <p id="formSubtitle" class="text-indigo-200 mt-2 text-xs sm:text-sm md:text-base font-medium flex items-center gap-2">
+                            <i class="ph-fill ph-magic-wand text-indigo-400 shrink-0"></i> Auto-fill sistem cerdas aktif
+                        </p>
+                        
+                        <button type="button" id="cancelEditBtn" onclick="resetEditMode()" class="hidden mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-bold backdrop-blur-md transition-all">
+                            <i class="ph-bold ph-x mr-1"></i> Batal Edit
+                        </button>
+                    </div>
+                    <i class="ph-duotone ph-clipboard-text absolute -right-6 -bottom-10 sm:-right-10 sm:-bottom-12 text-[140px] sm:text-[180px] text-white opacity-5 transform -rotate-12 pointer-events-none"></i>
+                </div>
+
+                <form id="returForm" class="p-4 sm:p-8 md:p-10 w-full max-w-full box-border" onsubmit="handleFormSubmit(event)">
+                    
+                    <!-- 1. SEGMEN ARMADA -->
+                    <div class="mb-8 sm:mb-10 relative z-50 w-full max-w-full">
+                        <div class="flex items-center gap-3 mb-4 sm:mb-5 border-b-2 border-indigo-50 pb-3">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold shrink-0">
+                                <i class="ph-fill ph-truck text-base sm:text-lg"></i>
+                            </div>
+                            <h3 class="font-extrabold text-slate-800 text-sm sm:text-base uppercase tracking-widest">Informasi Armada</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full max-w-full">
+                            <div class="w-full relative z-20 min-w-0 max-w-full">
+                                <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Tanggal Balikan</label>
+                                <div class="relative w-full max-w-full box-border">
+                                    <i class="ph-bold ph-calendar-blank absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10"></i>
+                                    <input type="date" name="tanggal" required class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base font-bold text-slate-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+                                </div>
+                            </div>
+                            <div class="w-full relative z-10 min-w-0 max-w-full">
+                                <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">No. Polisi Armada</label>
+                                <div class="relative w-full max-w-full box-border">
+                                    <i class="ph-bold ph-hash absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10"></i>
+                                    <input type="text" name="noPol" placeholder="Contoh: B 1234 ABC" required class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all uppercase text-sm sm:text-base font-extrabold text-slate-800 placeholder:normal-case placeholder:font-semibold focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. SEGMEN TOKO -->
+                    <div class="mb-8 sm:mb-10 relative z-40 w-full max-w-full">
+                        <div class="flex items-center gap-3 mb-4 sm:mb-5 border-b-2 border-purple-50 pb-3">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center font-bold shrink-0">
+                                <i class="ph-fill ph-storefront text-base sm:text-lg"></i>
+                            </div>
+                            <h3 class="font-extrabold text-slate-800 text-sm sm:text-base uppercase tracking-widest">Identitas Toko</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 w-full max-w-full">
+                            <div class="w-full md:col-span-4 lg:col-span-3 relative z-30 min-w-0 max-w-full">
+                                <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Kode Toko</label>
+                                <div class="custom-select-container w-full max-w-full box-border" id="storeSelectContainer">
+                                    <i class="ph-bold ph-magnifying-glass absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10"></i>
+                                    <input type="text" id="storeSearch" name="kodeToko" autocomplete="off" placeholder="Ketik Kode..." required 
+                                           class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base uppercase font-extrabold text-slate-800 placeholder:normal-case placeholder:font-semibold focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                    <div id="storeOptions" class="custom-select-options absolute w-full mt-1 bg-white rounded-xl py-2 shadow-2xl"></div>
+                                </div>
+                            </div>
+                            <div class="w-full md:col-span-8 lg:col-span-6 relative z-20 min-w-0 max-w-full">
+                                <div class="flex flex-wrap justify-between items-center gap-1 mb-1.5 sm:mb-2">
+                                    <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest">Nama Toko</label>
+                                    <span class="text-[9px] font-bold text-slate-500 bg-slate-200 px-1.5 sm:px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1 shrink-0">
+                                        <i class="ph-bold ph-lock-key"></i> Locked
+                                    </span>
+                                </div>
+                                <div class="relative w-full max-w-full box-border">
+                                    <i class="ph-bold ph-buildings absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10 opacity-50"></i>
+                                    <input type="text" id="namaTokoInput" name="namaToko" placeholder="Terisi otomatis..." required readonly tabindex="-1"
+                                           class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-100/70 border border-slate-200 outline-none text-sm sm:text-base font-bold text-slate-500 cursor-not-allowed select-none">
+                                </div>
+                            </div>
+                            <div class="w-full md:col-span-12 lg:col-span-3 relative z-10 min-w-0 max-w-full">
+                                <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Grup Cabang</label>
+                                <div class="custom-select-container w-full max-w-full box-border" id="groupSelectContainer">
+                                    <i class="ph-bold ph-map-pin absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-purple-400 text-lg z-10"></i>
+                                    <input type="text" id="groupSearch" name="grup" autocomplete="off" placeholder="Pilih Grup..." required 
+                                           class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base uppercase font-extrabold text-slate-800 placeholder:normal-case placeholder:font-semibold focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                    <div id="groupOptions" class="custom-select-options absolute w-full mt-1 bg-white rounded-xl py-2 shadow-2xl"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. SEGMEN PRODUK -->
+                    <div class="mb-8 sm:mb-10 relative z-30 w-full max-w-full">
+                        <div class="flex items-center gap-3 mb-4 sm:mb-5 border-b-2 border-emerald-50 pb-3">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold shrink-0">
+                                <i class="ph-fill ph-package text-base sm:text-lg"></i>
+                            </div>
+                            <h3 class="font-extrabold text-slate-800 text-sm sm:text-base uppercase tracking-widest">Detail Produk</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 w-full max-w-full">
+                            <div class="w-full md:col-span-12 lg:col-span-6 relative z-30 min-w-0 max-w-full">
+                                <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Pilih Produk (DESC / SKU)</label>
+                                <div class="custom-select-container w-full max-w-full box-border" id="productSelectContainer">
+                                    <i class="ph-bold ph-box-box absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10"></i>
+                                    <input type="text" id="productSearch" name="deskripsi" autocomplete="off" placeholder="Ketik nama atau SKU..." required 
+                                           class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base font-bold text-slate-800 placeholder:font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+                                    <div id="productOptions" class="custom-select-options absolute w-full mt-1 bg-white rounded-xl py-2 shadow-2xl"></div>
+                                </div>
+                            </div>
+                            <div class="w-full md:col-span-6 lg:col-span-3 relative z-20 min-w-0 max-w-full">
+                                <div class="flex flex-wrap justify-between items-center gap-1 mb-1.5 sm:mb-2">
+                                    <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest">Suhu</label>
+                                    <span class="text-[9px] font-bold text-slate-500 bg-slate-200 px-1.5 sm:px-2 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1 shrink-0">
+                                        <i class="ph-bold ph-lock-key"></i> Locked
+                                    </span>
+                                </div>
+                                <div class="relative w-full max-w-full box-border">
+                                    <i class="ph-bold ph-thermometer absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10 opacity-50"></i>
+                                    <select name="kategori" id="categorySelect" tabindex="-1" class="w-full max-w-full box-border pl-9 sm:pl-11 pr-8 py-3 sm:py-3.5 rounded-xl bg-slate-100/70 border border-slate-200 outline-none text-sm sm:text-base font-extrabold text-slate-500 cursor-not-allowed appearance-none pointer-events-none select-none">
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 sm:px-4 z-10">
+                                         <i class="ph-bold ph-lock-key text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-full md:col-span-6 lg:col-span-3 relative z-10 min-w-0 max-w-full">
+                                <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Jumlah (QTY)</label>
+                                <div class="relative w-full max-w-full box-border">
+                                    <i class="ph-bold ph-stack absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-indigo-500 text-lg z-10"></i>
+                                    <input type="number" id="qtyInput" name="qty" placeholder="0" required min="1" class="w-full max-w-full box-border pl-9 sm:pl-11 pr-10 sm:pr-12 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-indigo-200 outline-none text-lg sm:text-xl font-black text-indigo-600 text-center shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+                                    <span class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-slate-400 font-extrabold text-[10px] sm:text-xs uppercase">Pcs</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. SEGMEN KETERANGAN -->
+                    <div class="mb-6 relative z-20 w-full max-w-full">
+                        <div class="flex items-center gap-3 mb-4 sm:mb-5 border-b-2 border-amber-50 pb-3">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold shrink-0">
+                                <i class="ph-fill ph-note-pencil text-base sm:text-lg"></i>
+                            </div>
+                            <h3 class="font-extrabold text-slate-800 text-sm sm:text-base uppercase tracking-widest">Keterangan</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-5 w-full max-w-full">
+                            <div class="w-full relative z-20 min-w-0 max-w-full">
+                                <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Status Faktur / SJI</label>
+                                <div class="relative w-full max-w-full h-[48px] sm:h-[56px] bg-slate-50 border border-slate-200 rounded-xl flex items-center px-3 sm:px-4 justify-between transition-colors focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-100 box-border">
+                                    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                                        <i class="ph-bold ph-receipt text-slate-400 text-base sm:text-lg"></i>
+                                        <span id="fakturLabel" class="text-xs sm:text-sm font-bold text-slate-500 transition-colors duration-300">Tanpa Faktur</span>
+                                    </div>
+                                    <label class="relative flex items-center cursor-pointer group shrink-0">
+                                        <input type="checkbox" id="fakturCheckbox" name="fakturCheckbox" class="sr-only peer" onchange="document.getElementById('fakturLabel').innerText = this.checked ? 'Ada Faktur' : 'Tanpa Faktur'; document.getElementById('fakturLabel').className = this.checked ? 'text-xs sm:text-sm font-extrabold text-emerald-600 transition-colors duration-300' : 'text-xs sm:text-sm font-bold text-slate-500 transition-colors duration-300';">
+                                        <div class="w-10 sm:w-11 h-5 sm:h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 sm:after:h-5 after:w-4 sm:after:w-5 after:transition-all peer-checked:bg-emerald-500 shadow-inner border border-slate-300 peer-checked:border-emerald-600 transition-colors"></div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="w-full relative z-10 min-w-0 max-w-full">
+                                <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Keterangan (KET)</label>
+                                <div class="relative w-full max-w-full box-border">
+                                    <i class="ph-bold ph-tag absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10"></i>
+                                    <select name="keterangan" id="ketInput" required class="w-full max-w-full box-border pl-9 sm:pl-11 pr-8 sm:pr-10 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base font-extrabold text-slate-800 appearance-none cursor-pointer focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+                                        <option value="" disabled selected>-- Keterangan --</option>
+                                        <option value="SJI">SJI</option>
+                                        <option value="GAGAL KIRIM">GAGAL KIRIM</option>
+                                        <option value="KONTAINER BALIKAN">KONTAINER BALIKAN</option>
+                                        <option value="SUSULAN">SUSULAN</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 sm:px-4 z-10">
+                                         <i class="ph-bold ph-caret-down text-slate-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="w-full relative z-10 min-w-0 max-w-full">
+                            <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Notes / Alasan Khusus</label>
+                            <div class="relative w-full max-w-full box-border">
+                                <i class="ph-bold ph-text-align-left absolute left-3 sm:left-4 top-3.5 sm:top-4 text-slate-400 text-lg z-10"></i>
+                                <textarea name="notes" rows="2" placeholder="Catatan tambahan (opsional)..." class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 sm:pr-4 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none resize-none text-sm sm:text-base font-semibold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Actions -->
+                    <div class="mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-slate-200 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 sm:gap-6 relative z-10 w-full max-w-full box-border">
+                        <label class="flex flex-row items-center sm:items-center space-x-3 cursor-pointer group w-full md:w-auto bg-slate-50 border border-slate-200 py-3 sm:py-3.5 px-3 sm:px-4 rounded-xl hover:bg-indigo-50 transition-colors box-border" id="multiInputContainer">
+                            <div class="relative shrink-0">
+                                <input type="checkbox" id="keepDataCheck" class="peer sr-only">
+                                <div class="w-10 sm:w-11 h-5 sm:h-6 bg-slate-300 rounded-full peer-checked:bg-indigo-500 transition-colors"></div>
+                                <div class="absolute left-1 top-1 w-3 sm:w-4 h-3 sm:h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5 shadow-sm"></div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <span class="block text-[13px] sm:text-sm font-extrabold text-slate-700 leading-tight truncate">Mode Multi-Input ⚡</span>
+                                <span class="block text-[9px] sm:text-[11px] font-medium text-slate-500 mt-0.5 leading-tight truncate">Kosongkan produk setelah simpan.</span>
+                            </div>
+                        </label>
+
+                        <button type="submit" id="submitBtn" class="w-full md:w-auto px-6 sm:px-10 py-3.5 sm:py-4 bg-slate-900 text-white rounded-xl font-bold text-sm sm:text-base hover:bg-indigo-600 transition-all shadow-lg shadow-slate-300 flex items-center justify-center gap-2 transform active:scale-95 shrink-0 box-border">
+                            <i class="ph-bold ph-paper-plane-tilt text-base sm:text-lg"></i> Simpan Laporan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tab 2: Display Riwayat -->
+        <div id="content-display" class="tab-content w-full max-w-full box-border">
+            <div class="glass-card rounded-[1.5rem] sm:rounded-[2rem] shadow-xl overflow-hidden flex flex-col h-[85vh] border border-white w-full max-w-full box-border">
+                <div class="p-4 sm:p-6 md:p-8 border-b border-slate-200 bg-white/70 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 shrink-0 w-full max-w-full box-border">
+                    <div class="min-w-0 max-w-full">
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-800 truncate">Database Riwayat</h2>
+                        <p class="text-slate-500 text-xs sm:text-sm mt-0.5 sm:mt-1 flex items-center gap-2 font-medium truncate">
+                            <span class="relative flex h-2 sm:h-2.5 w-2 sm:w-2.5 shrink-0"><span class="animate-ping absolute h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-full w-full bg-emerald-500"></span></span>
+                            150 data balikan terakhir
+                        </p>
+                    </div>
+                    <div class="flex gap-2 sm:gap-3 w-full md:w-auto box-border">
+                        <div class="relative w-full md:w-72 min-w-0 max-w-full">
+                            <i class="ph-bold ph-magnifying-glass absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10"></i>
+                            <input type="text" id="liveSearchInput" placeholder="Cari data..." class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-xl bg-white border border-slate-200 outline-none text-xs sm:text-sm font-semibold shadow-sm focus:border-indigo-500">
+                        </div>
+                        <button onclick="refreshHistory()" class="px-3 sm:px-4 py-2.5 sm:py-3 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-xl font-bold hover:bg-indigo-600 hover:text-white transition-all shrink-0 flex items-center justify-center box-border" title="Refresh">
+                            <i class="ph-bold ph-arrows-clockwise text-base sm:text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto overflow-y-auto flex-1 bg-white/40 w-full rounded-b-[1.5rem] sm:rounded-b-[2rem] box-border relative">
+                    <table class="w-full text-left min-w-[750px] border-collapse">
+                        <thead class="bg-slate-100/90 backdrop-blur-sm text-slate-500 uppercase text-[9px] sm:text-[10px] font-extrabold tracking-widest sticky top-0 z-20 shadow-sm border-b border-slate-200">
+                            <tr>
+                                <th class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">Armada & Waktu</th>
+                                <th class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">Identitas Toko</th>
+                                <th class="px-4 sm:px-6 py-3 sm:py-4">Produk Dikembalikan</th>
+                                <th class="px-4 sm:px-6 py-3 sm:py-4 text-center whitespace-nowrap">Qty</th>
+                                <th class="px-4 sm:px-6 py-3 sm:py-4 text-center whitespace-nowrap"><i class="ph-bold ph-gear"></i> Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody" class="divide-y divide-slate-200/60 text-xs sm:text-sm"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Dashboard Analytics -->
+        <div id="content-dashboard" class="tab-content w-full max-w-full box-border">
+            <div class="mb-5 sm:mb-8 flex flex-col sm:flex-row sm:justify-between items-start sm:items-end gap-2 px-1">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800">Visualisasi Data</h2>
+                    <p class="text-slate-500 font-medium mt-1 text-xs sm:text-sm">Grafik analisis berdasarkan 150 retur terakhir.</p>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-5 sm:mb-8 w-full max-w-full box-border" id="kpiContainer">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Charts (Using Chart.js) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 w-full max-w-full box-border">
+                <div class="glass-card rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-8 shadow-xl border border-white w-full max-w-full box-border min-w-0">
+                    <h3 class="font-bold text-slate-800 mb-4 sm:mb-6 flex items-center gap-2 text-sm sm:text-base border-b border-slate-100 pb-3 sm:pb-4">
+                        <i class="ph-fill ph-truck text-indigo-500 text-xl sm:text-2xl"></i> Top 5 Armada (Qty)
+                    </h3>
+                    <div class="relative h-48 sm:h-72 w-full max-w-full box-border">
+                        <canvas id="chartArmada"></canvas>
+                    </div>
+                </div>
+                
+                <div class="glass-card rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-8 shadow-xl border border-white w-full max-w-full box-border min-w-0">
+                    <h3 class="font-bold text-slate-800 mb-4 sm:mb-6 flex items-center gap-2 text-sm sm:text-base border-b border-slate-100 pb-3 sm:pb-4">
+                        <i class="ph-fill ph-thermometer text-purple-500 text-xl sm:text-2xl"></i> Proporsi Suhu
+                    </h3>
+                    <div class="relative h-48 sm:h-72 flex justify-center w-full max-w-full box-border">
+                        <canvas id="chartSuhu"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // ==========================================
+        // KONFIGURASI PENTING (WAJIB DIISI)
+        // ==========================================
+        // Masukkan URL Web App Google Apps Script kamu di bawah ini
+        const SCRIPT_URL = ""; 
+
+        let rawHistoryData = []; 
+        let armadaChartInstance = null;
+        let suhuChartInstance = null;
+        let currentEditRowIndex = null; 
+
+        window.onload = function() {
+            if (!SCRIPT_URL || SCRIPT_URL === "") {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Konfigurasi Dibutuhkan',
+                    text: 'Silakan isi variabel SCRIPT_URL di dalam kode HTML agar terhubung ke Spreadsheet.',
+                    confirmButtonText: 'Mengerti',
+                    customClass: { popup: 'rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl mx-4' }
+                });
+                document.getElementById('premiumLoader').style.display = 'none';
+                return;
+            }
+
+            // Ganti google.script.run dengan fetch API (GET)
+            fetch(`${SCRIPT_URL}?action=getInitialData`)
+                .then(response => response.json())
+                .then(data => {
+                    initApp(data);
+                })
+                .catch(err => {
+                    Swal.fire('Error Sistem', 'Gagal memuat data: Pastikan URL GAS benar dan bisa diakses. ' + err.message, 'error');
+                    document.getElementById('premiumLoader').style.display = 'none';
+                });
+        };
+
+        function initApp(data) {
+            const loader = document.getElementById('premiumLoader');
+            loader.style.opacity = '0';
+            setTimeout(() => { loader.style.display = 'none'; }, 700);
+
+            setupCustomSelect('productSearch', 'productOptions', data.products, true, (selectedItem) => {
+                if(selectedItem && selectedItem.cat) {
+                    const catSelect = document.getElementById('categorySelect');
+                    let exists = Array.from(catSelect.options).some(opt => opt.value.toLowerCase() === selectedItem.cat.toLowerCase());
+                    if(!exists && selectedItem.cat !== "") {
+                        catSelect.innerHTML += `<option value="${selectedItem.cat}">${selectedItem.cat}</option>`;
+                    }
+                    catSelect.value = selectedItem.cat.toUpperCase();
+                }
+            });
+
+            setupCustomSelect('storeSearch', 'storeOptions', data.stores, false, (selectedItem) => {
+                if(selectedItem) document.getElementById('namaTokoInput').value = selectedItem.nama || '';
+            });
+
+            const uniqueGroups = [...new Set(data.stores.map(s => s.grup).filter(Boolean))].sort();
+            setupCustomSelect('groupSearch', 'groupOptions', uniqueGroups);
+
+            const catSelect = document.getElementById('categorySelect');
+            catSelect.innerHTML = data.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            
+            refreshHistory();
+        }
+
+        function setupCustomSelect(inputId, optionsId, items, isProduct = false, onSelectCallback = null) {
+            const input = document.getElementById(inputId);
+            const container = document.getElementById(optionsId);
+
+            function filterItems(val) {
+                const search = val.toLowerCase();
+                const filtered = items.filter(item => {
+                    const text = isProduct ? (item.label + " " + item.sub) : (typeof item === 'string' ? item : item.label + " " + item.nama);
+                    return text.toLowerCase().includes(search);
+                }).slice(0, 40);
+
+                container.innerHTML = filtered.length ? '' : '<div class="px-4 py-4 text-slate-400 text-xs font-bold text-center">Tidak ada hasil ditemukan</div>';
+                
+                filtered.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'px-4 sm:px-5 py-3 cursor-pointer border-b border-slate-100 last:border-0 hover:bg-indigo-50 transition-colors w-full overflow-hidden';
+                    
+                    if(isProduct) {
+                        div.innerHTML = `<div class="font-extrabold text-xs sm:text-sm text-slate-800 truncate w-full">${item.label}</div>
+                                         <div class="text-[9px] sm:text-[10px] text-slate-500 flex justify-between items-center mt-1 w-full">
+                                            <span class="truncate pr-2 font-medium">SKU: <span class="font-bold text-slate-600">${item.sub}</span></span> 
+                                            <span class="text-emerald-600 font-extrabold shrink-0 bg-emerald-100 px-1.5 py-0.5 rounded">${item.cat}</span>
+                                         </div>`;
+                        div.onclick = () => { input.value = item.label; container.classList.remove('active'); if(onSelectCallback) onSelectCallback(item); };
+                    } else if (typeof item === 'string') {
+                        div.innerHTML = `<div class="font-extrabold text-xs sm:text-sm text-slate-800 uppercase truncate w-full">${item}</div>`;
+                        div.onclick = () => { input.value = item; container.classList.remove('active'); if(onSelectCallback) onSelectCallback(item); };
+                    } else {
+                        div.innerHTML = `<div class="font-extrabold text-xs sm:text-sm text-slate-800 truncate w-full">${item.label}</div>
+                                         <div class="text-[9px] sm:text-[10px] text-slate-500 mt-1 truncate w-full">${item.nama} • <span class="text-purple-600 font-bold">${item.grup}</span></div>`;
+                        div.onclick = () => { input.value = item.label; container.classList.remove('active'); if(onSelectCallback) onSelectCallback(item); };
+                    }
+                    container.appendChild(div);
+                });
+            }
+
+            input.oninput = (e) => { 
+                const val = e.target.value;
+                filterItems(val); 
+                
+                const searchVal = val.trim().toLowerCase();
+                if(searchVal.length > 0) {
+                    const exactMatch = items.find(item => {
+                        if (isProduct) return item.sub.toLowerCase() === searchVal || item.label.toLowerCase() === searchVal;
+                        if (typeof item === 'string') return item.toLowerCase() === searchVal;
+                        return item.label.toLowerCase() === searchVal || item.nama.toLowerCase() === searchVal;
+                    });
+                    if (exactMatch && onSelectCallback) onSelectCallback(exactMatch);
+                }
+            };
+            
+            input.onfocus = () => { container.classList.add('active'); filterItems(input.value); };
+            
+            document.addEventListener('click', (e) => {
+                if (!input.parentElement.contains(e.target)) container.classList.remove('active');
+            });
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                b.classList.add('text-slate-500');
+            });
+            
+            document.getElementById(`content-${tab}`).classList.add('active');
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            activeBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+            activeBtn.classList.remove('text-slate-500');
+
+            activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            if (tab === 'display' || tab === 'dashboard') refreshHistory();
+        }
+
+        function editData(rowIndex) {
+            const rowData = rawHistoryData.find(r => r.rowIndex === rowIndex);
+            if(!rowData) return;
+
+            document.querySelector('input[name="tanggal"]').value = rowData.tanggal;
+            document.querySelector('input[name="noPol"]').value = rowData.noPol;
+            
+            document.getElementById('storeSearch').value = rowData.kodeToko;
+            document.getElementById('namaTokoInput').value = rowData.namaToko;
+            document.getElementById('groupSearch').value = rowData.grup;
+
+            document.getElementById('productSearch').value = rowData.deskripsi;
+            document.getElementById('qtyInput').value = rowData.qty;
+
+            const catSelect = document.getElementById('categorySelect');
+            let catExists = Array.from(catSelect.options).some(opt => opt.value.toUpperCase() === (rowData.kategori || '').toUpperCase());
+            if(!catExists && rowData.kategori) {
+                catSelect.innerHTML += `<option value="${rowData.kategori}">${rowData.kategori}</option>`;
+            }
+            catSelect.value = (rowData.kategori || '').toUpperCase();
+
+            document.getElementById('ketInput').value = (rowData.ket || '').toUpperCase();
+
+            const fakturCheckbox = document.getElementById('fakturCheckbox');
+            const fakturLabel = document.getElementById('fakturLabel');
+            if (rowData.faktur === 'ADA FAKTUR') {
+                fakturCheckbox.checked = true;
+                fakturLabel.innerText = 'Ada Faktur';
+                fakturLabel.className = 'text-xs sm:text-sm font-extrabold text-emerald-600 transition-colors duration-300';
+            } else {
+                fakturCheckbox.checked = false;
+                fakturLabel.innerText = 'Tanpa Faktur';
+                fakturLabel.className = 'text-xs sm:text-sm font-bold text-slate-500 transition-colors duration-300';
+            }
+
+            document.querySelector('textarea[name="notes"]').value = rowData.notes;
+
+            currentEditRowIndex = rowIndex;
+            
+            document.getElementById('formTitle').innerHTML = `Ubah Baris #${rowIndex}`;
+            document.getElementById('formSubtitle').innerHTML = `<i class="ph-fill ph-pencil-simple text-amber-500 shrink-0"></i> Anda sedang dalam mode perbaikan data`;
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+            document.getElementById('multiInputContainer').classList.add('opacity-50', 'pointer-events-none');
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = `<i class="ph-bold ph-pencil-simple text-base sm:text-lg"></i> Update Laporan`;
+            submitBtn.classList.remove('bg-slate-900', 'hover:bg-indigo-600');
+            submitBtn.classList.add('bg-amber-500', 'hover:bg-amber-600', 'shadow-amber-200');
+
+            switchTab('input');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetEditMode() {
+            currentEditRowIndex = null;
+            document.getElementById('returForm').reset();
+            
+            document.getElementById('fakturCheckbox').checked = false;
+            document.getElementById('fakturLabel').innerText = 'Tanpa Faktur';
+            document.getElementById('fakturLabel').className = 'text-xs sm:text-sm font-bold text-slate-500 transition-colors duration-300';
+            
+            document.getElementById('formTitle').innerHTML = `Formulir Retur`;
+            document.getElementById('formSubtitle').innerHTML = `<i class="ph-fill ph-magic-wand text-indigo-400 shrink-0"></i> Auto-fill sistem cerdas aktif`;
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+            document.getElementById('multiInputContainer').classList.remove('opacity-50', 'pointer-events-none');
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = `<i class="ph-bold ph-paper-plane-tilt text-base sm:text-lg"></i> Simpan Laporan`;
+            submitBtn.classList.remove('bg-amber-500', 'hover:bg-amber-600', 'shadow-amber-200');
+            submitBtn.classList.add('bg-slate-900', 'hover:bg-indigo-600');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            if (!SCRIPT_URL || SCRIPT_URL === "") {
+                Swal.fire('Konfigurasi Error', 'SCRIPT_URL belum diisi.', 'error');
+                return;
+            }
+
+            const form = e.target;
+            const data = Object.fromEntries(new FormData(form).entries());
+            const keepData = document.getElementById('keepDataCheck').checked;
+            
+            const isFakturChecked = document.getElementById('fakturCheckbox').checked;
+            data.faktur = isFakturChecked ? 'ADA FAKTUR' : '-';
+
+            const isEditing = currentEditRowIndex !== null;
+            const loadingText = isEditing ? 'Memperbarui data di Spreadsheet...' : 'Menyandikan laporan ke Spreadsheet...';
+
+            Swal.fire({
+                html: `
+                    <div class="flex flex-col items-center justify-center p-2 sm:p-4">
+                        <div class="relative w-20 h-20 sm:w-24 sm:h-24 mb-4 sm:mb-6">
+                            <svg class="absolute inset-0 w-full h-full text-indigo-500 animate-[spin_2s_linear_infinite]" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="ph-fill ph-paper-plane-tilt text-2xl sm:text-3xl text-indigo-600 animate-pulse"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 mb-1 sm:mb-2 tracking-tight">Mengirim Data</h3>
+                        <p class="text-slate-500 font-medium text-xs sm:text-sm text-center">${loadingText}</p>
+                    </div>
+                `,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                customClass: { popup: 'rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl border border-slate-100 mx-4' }
+            });
+
+            // Siapkan payload dengan action yang sesuai untuk API
+            const payload = {
+                ...data,
+                action: isEditing ? 'updateForm' : 'submitForm',
+                rowIndex: currentEditRowIndex
+            };
+
+            // Gunakan fetch (POST) untuk mengirim data ke Google Apps Script
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                // Google Apps Script doPost menerima plain text / string JSON dengan baik
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(res => {
+                if(res.status === 'success') {
+                    Swal.fire({
+                        html: `
+                            <div class="flex flex-col items-center p-2">
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-100 rounded-[1rem] sm:rounded-[1.5rem] flex items-center justify-center mb-4 sm:mb-5 animate__animated animate__zoomIn">
+                                    <i class="ph-bold ph-check text-3xl sm:text-4xl text-emerald-500"></i>
+                                </div>
+                                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-1 sm:mb-2">Sukses!</h2>
+                                <p class="text-slate-500 font-medium text-sm sm:text-base text-center">Data retur telah ${isEditing ? 'diperbarui' : 'diamankan'} di sistem.</p>
+                            </div>
+                        `,
+                        confirmButtonText: 'Selesai',
+                        confirmButtonColor: '#4f46e5',
+                        customClass: {
+                            confirmButton: 'px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold text-sm sm:text-base shadow-lg shadow-indigo-200',
+                            popup: 'rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl border border-slate-100 mx-4'
+                        }
+                    });
+                    
+                    if (isEditing) {
+                        resetEditMode();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        switchTab('display');
+                    } else if (keepData) {
+                        document.getElementById('productSearch').value = '';
+                        document.getElementById('qtyInput').value = '';
+                        document.getElementById('fakturCheckbox').checked = false;
+                        document.getElementById('fakturLabel').innerText = 'Tanpa Faktur';
+                        document.getElementById('fakturLabel').className = 'text-xs sm:text-sm font-bold text-slate-500 transition-colors duration-300';
+                        document.getElementById('ketInput').value = '';
+                        form.notes.value = '';
+                        document.getElementById('productSearch').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(() => document.getElementById('productSearch').focus(), 500);
+                    } else {
+                        form.reset();
+                        document.getElementById('fakturLabel').innerText = 'Tanpa Faktur';
+                        document.getElementById('fakturLabel').className = 'text-xs sm:text-sm font-bold text-slate-500 transition-colors duration-300';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    refreshHistory();
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: res.message, customClass: { popup: 'rounded-[1.5rem] sm:rounded-[2rem] mx-4' } });
+                }
+            })
+            .catch(err => {
+                Swal.fire('Error Sistem', err.message, 'error');
+            });
+        }
+
+        function applySearchFilter() {
+            const searchInput = document.getElementById('liveSearchInput');
+            const term = searchInput ? searchInput.value.toLowerCase() : '';
+            
+            if (!term) {
+                renderHistoryTable(rawHistoryData);
+                return;
+            }
+            
+            const filtered = rawHistoryData.filter(r => 
+                (r.noPol || '').toLowerCase().includes(term) ||
+                (r.namaToko || '').toLowerCase().includes(term) ||
+                (r.kodeToko || '').toLowerCase().includes(term) ||
+                (r.deskripsi || '').toLowerCase().includes(term) ||
+                (r.tanggalTampil || '').toLowerCase().includes(term) ||
+                (r.grup || '').toLowerCase().includes(term) ||
+                (r.kategori || '').toLowerCase().includes(term) ||
+                (r.faktur || '').toLowerCase().includes(term)
+            );
+            renderHistoryTable(filtered);
+        }
+
+        function refreshHistory() {
+            if (!SCRIPT_URL) return;
+
+            // Ganti google.script.run dengan fetch API (GET)
+            fetch(`${SCRIPT_URL}?action=getDataHistory`)
+                .then(response => response.json())
+                .then(data => {
+                    rawHistoryData = data || [];
+                    applySearchFilter(); 
+                    buildDashboard(rawHistoryData);
+                })
+                .catch(err => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Koneksi Terputus',
+                        text: 'Gagal memuat tabel Database: ' + err.message,
+                        customClass: { popup: 'rounded-[1.5rem] sm:rounded-[2rem] mx-4' }
+                    });
+                    renderHistoryTable([]); 
+                });
+        }
+
+        document.getElementById('liveSearchInput').addEventListener('input', applySearchFilter);
+
+        function renderHistoryTable(data) {
+            const body = document.getElementById('historyBody');
+            if (!data || data.length === 0) {
+                body.innerHTML = '<tr><td colspan="5" class="py-10 sm:py-16 text-center text-slate-400 font-bold text-xs sm:text-sm bg-white/50"><i class="ph-duotone ph-folder-open text-3xl sm:text-4xl mb-2 text-slate-300 block"></i>Belum ada data riwayat.</td></tr>';
+                return;
+            }
+            body.innerHTML = data.map(row => {
+                let badge = 'bg-slate-100 text-slate-600 border border-slate-200';
+                const cat = (row.kategori || '').toLowerCase();
+                if (cat.includes('chiller')) badge = 'bg-blue-50 text-blue-600 border border-blue-200';
+                else if (cat.includes('freezer')) badge = 'bg-indigo-50 text-indigo-600 border border-indigo-200';
+                else if (cat.includes('ambient')) badge = 'bg-emerald-50 text-emerald-600 border border-emerald-200';
+
+                return `
+                <tr class="hover:bg-white transition-colors group">
+                    <td class="px-4 sm:px-6 py-3 sm:py-5 border-b border-slate-100">
+                        <div class="font-black text-xs sm:text-sm text-slate-800">${row.noPol}</div>
+                        <div class="text-[9px] sm:text-[11px] text-slate-500 font-medium mt-1 flex items-center gap-1"><i class="ph-fill ph-calendar-blank text-slate-400"></i> ${row.tanggalTampil}</div>
+                    </td>
+                    <td class="px-4 sm:px-6 py-3 sm:py-5 border-b border-slate-100">
+                        <div class="font-bold text-slate-700 text-[10px] sm:text-xs truncate max-w-[120px] sm:max-w-[200px]" title="${row.namaToko}">${row.namaToko || '-'}</div>
+                        <div class="text-[8px] sm:text-[10px] text-slate-500 mt-1 font-medium"><span class="font-bold text-slate-700 bg-slate-100 px-1 sm:px-1.5 py-0.5 rounded">${row.kodeToko}</span> • ${row.grup}</div>
+                    </td>
+                    <td class="px-4 sm:px-6 py-3 sm:py-5 border-b border-slate-100 max-w-[160px] sm:max-w-[250px]">
+                        <div class="font-extrabold text-slate-800 text-[10px] sm:text-sm truncate" title="${row.deskripsi}">${row.deskripsi}</div>
+                        <div class="flex flex-wrap items-center gap-1 sm:gap-2 mt-1 sm:mt-1.5">
+                            <span class="text-[7px] sm:text-[9px] font-bold px-1.5 sm:px-2 py-0.5 rounded uppercase ${badge}">${row.kategori || 'N/A'}</span>
+                            <span class="text-[8px] sm:text-[10px] text-slate-400 truncate italic font-medium" title="${row.notes}">${row.notes ? `<i class="ph-fill ph-quotes"></i> ${row.notes}` : ''}</span>
+                        </div>
+                    </td>
+                    <td class="px-4 sm:px-6 py-3 sm:py-5 border-b border-slate-100 text-center">
+                        <span class="inline-flex min-w-[2rem] sm:min-w-[3rem] justify-center px-1.5 sm:px-3 py-1 sm:py-1.5 bg-indigo-50 border border-indigo-100 text-indigo-700 font-black rounded-lg sm:rounded-xl text-[10px] sm:text-sm shadow-sm group-hover:scale-110 transition-transform">${row.qty}</span>
+                    </td>
+                    <td class="px-4 sm:px-6 py-3 sm:py-5 border-b border-slate-100 text-center">
+                        <button onclick="editData(${row.rowIndex})" class="p-1.5 sm:p-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-500 hover:text-white transition-all shadow-sm group-hover:scale-110" title="Edit Data ini">
+                            <i class="ph-bold ph-pencil-simple text-base sm:text-lg"></i>
+                        </button>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        function buildDashboard(data) {
+            if(data.length === 0) return;
+
+            let totalQty = 0;
+            let armadaCount = {};
+            let katCount = {};
+
+            data.forEach(r => {
+                totalQty += Number(r.qty) || 0;
+                let pol = r.noPol || 'Tanpa Plat';
+                armadaCount[pol] = (armadaCount[pol] || 0) + (Number(r.qty) || 0);
+                let kat = r.kategori || 'Lainnya';
+                katCount[kat] = (katCount[kat] || 0) + 1;
+            });
+
+            document.getElementById('kpiContainer').innerHTML = `
+                <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 text-white rounded-xl sm:rounded-[1.5rem] p-3 sm:p-6 shadow-lg shadow-indigo-200 border border-indigo-400 min-w-0">
+                    <p class="text-indigo-200 font-extrabold text-[8px] sm:text-[10px] uppercase tracking-widest mb-1 truncate">Total Entri</p>
+                    <h3 class="text-xl sm:text-3xl lg:text-4xl font-black">${data.length}</h3>
+                </div>
+                <div class="bg-gradient-to-br from-purple-500 to-purple-700 text-white rounded-xl sm:rounded-[1.5rem] p-3 sm:p-6 shadow-lg shadow-purple-200 border border-purple-400 min-w-0">
+                    <p class="text-purple-200 font-extrabold text-[8px] sm:text-[10px] uppercase tracking-widest mb-1 truncate">Total Qty (Pcs)</p>
+                    <h3 class="text-xl sm:text-3xl lg:text-4xl font-black">${totalQty}</h3>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-xl sm:rounded-[1.5rem] p-3 sm:p-6 shadow-sm min-w-0">
+                    <p class="text-slate-400 font-extrabold text-[8px] sm:text-[10px] uppercase tracking-widest mb-1 truncate">Armada Aktif</p>
+                    <h3 class="text-xl sm:text-3xl lg:text-4xl font-black text-slate-800">${Object.keys(armadaCount).length}</h3>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-xl sm:rounded-[1.5rem] p-3 sm:p-6 shadow-sm min-w-0">
+                    <p class="text-slate-400 font-extrabold text-[8px] sm:text-[10px] uppercase tracking-widest mb-1 truncate">Rata Qty/Entri</p>
+                    <h3 class="text-xl sm:text-3xl lg:text-4xl font-black text-slate-800">${Math.round(totalQty/data.length)}</h3>
+                </div>
+            `;
+
+            const sortedArmada = Object.entries(armadaCount).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            const armadaLabels = sortedArmada.map(x => x[0]);
+            const armadaData = sortedArmada.map(x => x[1]);
+
+            if(armadaChartInstance) armadaChartInstance.destroy();
+            const ctxArmada = document.getElementById('chartArmada').getContext('2d');
+            armadaChartInstance = new Chart(ctxArmada, {
+                type: 'bar',
+                data: {
+                    labels: armadaLabels,
+                    datasets: [{
+                        label: 'Qty Balikan',
+                        data: armadaData,
+                        backgroundColor: '#6366f1',
+                        borderRadius: 6,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { padding: 10, cornerRadius: 8, bodyFont: { size: 10 } } },
+                    scales: { 
+                        y: { beginAtZero: true, grid: { borderDash: [4, 4], color: '#f1f5f9' }, border: {display: false}, ticks: { font: { size: 9, family: "'Plus Jakarta Sans', sans-serif", weight: 'bold' }, color: '#94a3b8' } }, 
+                        x: { grid: { display: false }, border: {display: false}, ticks: { font: { size: 9, family: "'Plus Jakarta Sans', sans-serif", weight: 'bold' }, color: '#64748b' } } 
+                    }
+                }
+            });
+
+            const katLabels = Object.keys(katCount);
+            const katData = Object.values(katCount);
+            const katColors = katLabels.map(label => {
+                let l = label.toLowerCase();
+                if(l.includes('chiller')) return '#3b82f6';
+                if(l.includes('freezer')) return '#8b5cf6';
+                if(l.includes('ambient')) return '#10b981';
+                return '#94a3b8';
+            });
+
+            if(suhuChartInstance) suhuChartInstance.destroy();
+            const ctxSuhu = document.getElementById('chartSuhu').getContext('2d');
+            suhuChartInstance = new Chart(ctxSuhu, {
+                type: 'doughnut',
+                data: {
+                    labels: katLabels,
+                    datasets: [{
+                        data: katData,
+                        backgroundColor: katColors,
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 10, font: { family: "'Plus Jakarta Sans', sans-serif", weight: 'bold', size: 9 }, color: '#64748b' } },
+                        tooltip: { padding: 10, cornerRadius: 8 }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
