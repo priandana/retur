@@ -97,6 +97,13 @@
             0% { transform: translateX(-150%); }
             100% { transform: translateX(250%); }
         }
+        
+        /* Reset Input Appearance for iOS */
+        input[type="date"]::-webkit-inner-spin-button,
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            display: none;
+            -webkit-appearance: none;
+        }
     </style>
 </head>
 <body class="text-slate-800 antialiased">
@@ -170,7 +177,7 @@
                     <i class="ph-duotone ph-clipboard-text absolute -right-6 -bottom-10 sm:-right-10 sm:-bottom-12 text-[140px] sm:text-[180px] text-white opacity-5 transform -rotate-12 pointer-events-none"></i>
                 </div>
 
-                <form id="returForm" class="p-4 sm:p-8 md:p-10 w-full max-w-full box-border" onsubmit="handleFormSubmit(event)">
+                <form id="returForm" class="p-4 sm:p-8 md:p-10 w-full max-w-full box-border overflow-hidden" onsubmit="handleFormSubmit(event)">
                     
                     <!-- 1. SEGMEN ARMADA -->
                     <div class="mb-8 sm:mb-10 relative z-50 w-full max-w-full">
@@ -184,16 +191,17 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full max-w-full">
                             <div class="w-full relative z-20 min-w-0 max-w-full">
                                 <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Tanggal Balikan</label>
-                                <div class="relative w-full max-w-full box-border">
-                                    <i class="ph-bold ph-calendar-blank absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10"></i>
-                                    <input type="date" name="tanggal" required class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base font-bold text-slate-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+                                <!-- Fix Mobile Safari Overflow: Adding flex, min-w-0, and appearance-none -->
+                                <div class="relative w-full max-w-full box-border flex">
+                                    <i class="ph-bold ph-calendar-blank absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10 pointer-events-none"></i>
+                                    <input type="date" name="tanggal" required class="flex-1 w-full min-w-0 block appearance-none box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base font-bold text-slate-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
                                 </div>
                             </div>
                             <div class="w-full relative z-10 min-w-0 max-w-full">
                                 <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">No. Polisi Armada</label>
-                                <div class="relative w-full max-w-full box-border">
-                                    <i class="ph-bold ph-hash absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10"></i>
-                                    <input type="text" name="noPol" placeholder="Contoh: B 1234 ABC" required class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all uppercase text-sm sm:text-base font-extrabold text-slate-800 placeholder:normal-case placeholder:font-semibold focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+                                <div class="relative w-full max-w-full box-border flex">
+                                    <i class="ph-bold ph-hash absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10 pointer-events-none"></i>
+                                    <input type="text" name="noPol" placeholder="Contoh: B 1234 ABC" required class="flex-1 w-full min-w-0 block appearance-none box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all uppercase text-sm sm:text-base font-extrabold text-slate-800 placeholder:normal-case placeholder:font-semibold focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
                                 </div>
                             </div>
                         </div>
@@ -211,10 +219,10 @@
                         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 w-full max-w-full">
                             <div class="w-full md:col-span-4 lg:col-span-3 relative z-30 min-w-0 max-w-full">
                                 <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Kode Toko</label>
-                                <div class="custom-select-container w-full max-w-full box-border" id="storeSelectContainer">
-                                    <i class="ph-bold ph-magnifying-glass absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10"></i>
+                                <div class="custom-select-container w-full max-w-full box-border flex" id="storeSelectContainer">
+                                    <i class="ph-bold ph-magnifying-glass absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10 pointer-events-none"></i>
                                     <input type="text" id="storeSearch" name="kodeToko" autocomplete="off" placeholder="Ketik Kode..." required 
-                                           class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base uppercase font-extrabold text-slate-800 placeholder:normal-case placeholder:font-semibold focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                           class="flex-1 w-full min-w-0 block appearance-none box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base uppercase font-extrabold text-slate-800 placeholder:normal-case placeholder:font-semibold focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
                                     <div id="storeOptions" class="custom-select-options absolute w-full mt-1 bg-white rounded-xl py-2 shadow-2xl"></div>
                                 </div>
                             </div>
@@ -225,18 +233,18 @@
                                         <i class="ph-bold ph-lock-key"></i> Locked
                                     </span>
                                 </div>
-                                <div class="relative w-full max-w-full box-border">
-                                    <i class="ph-bold ph-buildings absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10 opacity-50"></i>
+                                <div class="relative w-full max-w-full box-border flex">
+                                    <i class="ph-bold ph-buildings absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10 opacity-50 pointer-events-none"></i>
                                     <input type="text" id="namaTokoInput" name="namaToko" placeholder="Terisi otomatis..." required readonly tabindex="-1"
-                                           class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-100/70 border border-slate-200 outline-none text-sm sm:text-base font-bold text-slate-500 cursor-not-allowed select-none">
+                                           class="flex-1 w-full min-w-0 block appearance-none box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-100/70 border border-slate-200 outline-none text-sm sm:text-base font-bold text-slate-500 cursor-not-allowed select-none">
                                 </div>
                             </div>
                             <div class="w-full md:col-span-12 lg:col-span-3 relative z-10 min-w-0 max-w-full">
                                 <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Grup Cabang</label>
-                                <div class="custom-select-container w-full max-w-full box-border" id="groupSelectContainer">
-                                    <i class="ph-bold ph-map-pin absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-purple-400 text-lg z-10"></i>
+                                <div class="custom-select-container w-full max-w-full box-border flex" id="groupSelectContainer">
+                                    <i class="ph-bold ph-map-pin absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-purple-400 text-lg z-10 pointer-events-none"></i>
                                     <input type="text" id="groupSearch" name="grup" autocomplete="off" placeholder="Pilih Grup..." required 
-                                           class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base uppercase font-extrabold text-slate-800 placeholder:normal-case placeholder:font-semibold focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
+                                           class="flex-1 w-full min-w-0 block appearance-none box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base uppercase font-extrabold text-slate-800 placeholder:normal-case placeholder:font-semibold focus:border-purple-500 focus:ring-4 focus:ring-purple-100">
                                     <div id="groupOptions" class="custom-select-options absolute w-full mt-1 bg-white rounded-xl py-2 shadow-2xl"></div>
                                 </div>
                             </div>
@@ -255,10 +263,10 @@
                         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 w-full max-w-full">
                             <div class="w-full md:col-span-12 lg:col-span-6 relative z-30 min-w-0 max-w-full">
                                 <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Pilih Produk (DESC / SKU)</label>
-                                <div class="custom-select-container w-full max-w-full box-border" id="productSelectContainer">
-                                    <i class="ph-bold ph-box-box absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10"></i>
+                                <div class="custom-select-container w-full max-w-full box-border flex" id="productSelectContainer">
+                                    <i class="ph-bold ph-box-box absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10 pointer-events-none"></i>
                                     <input type="text" id="productSearch" name="deskripsi" autocomplete="off" placeholder="Ketik nama atau SKU..." required 
-                                           class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base font-bold text-slate-800 placeholder:font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
+                                           class="flex-1 w-full min-w-0 block appearance-none box-border pl-9 sm:pl-11 pr-3 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base font-bold text-slate-800 placeholder:font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100">
                                     <div id="productOptions" class="custom-select-options absolute w-full mt-1 bg-white rounded-xl py-2 shadow-2xl"></div>
                                 </div>
                             </div>
@@ -269,9 +277,9 @@
                                         <i class="ph-bold ph-lock-key"></i> Locked
                                     </span>
                                 </div>
-                                <div class="relative w-full max-w-full box-border">
-                                    <i class="ph-bold ph-thermometer absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10 opacity-50"></i>
-                                    <select name="kategori" id="categorySelect" tabindex="-1" class="w-full max-w-full box-border pl-9 sm:pl-11 pr-8 py-3 sm:py-3.5 rounded-xl bg-slate-100/70 border border-slate-200 outline-none text-sm sm:text-base font-extrabold text-slate-500 cursor-not-allowed appearance-none pointer-events-none select-none">
+                                <div class="relative w-full max-w-full box-border flex">
+                                    <i class="ph-bold ph-thermometer absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10 opacity-50 pointer-events-none"></i>
+                                    <select name="kategori" id="categorySelect" tabindex="-1" class="flex-1 w-full min-w-0 block appearance-none box-border pl-9 sm:pl-11 pr-8 py-3 sm:py-3.5 rounded-xl bg-slate-100/70 border border-slate-200 outline-none text-sm sm:text-base font-extrabold text-slate-500 cursor-not-allowed pointer-events-none select-none">
                                     </select>
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 sm:px-4 z-10">
                                          <i class="ph-bold ph-lock-key text-slate-400"></i>
@@ -280,10 +288,10 @@
                             </div>
                             <div class="w-full md:col-span-6 lg:col-span-3 relative z-10 min-w-0 max-w-full">
                                 <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Jumlah (QTY)</label>
-                                <div class="relative w-full max-w-full box-border">
-                                    <i class="ph-bold ph-stack absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-indigo-500 text-lg z-10"></i>
-                                    <input type="number" id="qtyInput" name="qty" placeholder="0" required min="1" class="w-full max-w-full box-border pl-9 sm:pl-11 pr-10 sm:pr-12 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-indigo-200 outline-none text-lg sm:text-xl font-black text-indigo-600 text-center shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
-                                    <span class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-slate-400 font-extrabold text-[10px] sm:text-xs uppercase">Pcs</span>
+                                <div class="relative w-full max-w-full box-border flex">
+                                    <i class="ph-bold ph-stack absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-indigo-500 text-lg z-10 pointer-events-none"></i>
+                                    <input type="number" id="qtyInput" name="qty" placeholder="0" required min="1" class="flex-1 w-full min-w-0 block appearance-none box-border pl-9 sm:pl-11 pr-10 sm:pr-12 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-indigo-200 outline-none text-lg sm:text-xl font-black text-indigo-600 text-center shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+                                    <span class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-slate-400 font-extrabold text-[10px] sm:text-xs uppercase pointer-events-none">Pcs</span>
                                 </div>
                             </div>
                         </div>
@@ -315,9 +323,9 @@
                             
                             <div class="w-full relative z-10 min-w-0 max-w-full">
                                 <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Keterangan (KET)</label>
-                                <div class="relative w-full max-w-full box-border">
-                                    <i class="ph-bold ph-tag absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10"></i>
-                                    <select name="keterangan" id="ketInput" required class="w-full max-w-full box-border pl-9 sm:pl-11 pr-8 sm:pr-10 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base font-extrabold text-slate-800 appearance-none cursor-pointer focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
+                                <div class="relative w-full max-w-full box-border flex">
+                                    <i class="ph-bold ph-tag absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10 pointer-events-none"></i>
+                                    <select name="keterangan" id="ketInput" required class="flex-1 w-full min-w-0 block appearance-none box-border pl-9 sm:pl-11 pr-8 sm:pr-10 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none transition-all text-sm sm:text-base font-extrabold text-slate-800 cursor-pointer focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
                                         <option value="" disabled selected>-- Keterangan --</option>
                                         <option value="SJI">SJI</option>
                                         <option value="GAGAL KIRIM">GAGAL KIRIM</option>
@@ -333,9 +341,9 @@
                         
                         <div class="w-full relative z-10 min-w-0 max-w-full">
                             <label class="text-[10px] sm:text-[11px] font-extrabold text-slate-500 uppercase tracking-widest mb-1.5 sm:mb-2 block">Notes / Alasan Khusus</label>
-                            <div class="relative w-full max-w-full box-border">
-                                <i class="ph-bold ph-text-align-left absolute left-3 sm:left-4 top-3.5 sm:top-4 text-slate-400 text-lg z-10"></i>
-                                <textarea name="notes" rows="2" placeholder="Catatan tambahan (opsional)..." class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 sm:pr-4 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none resize-none text-sm sm:text-base font-semibold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"></textarea>
+                            <div class="relative w-full max-w-full box-border flex">
+                                <i class="ph-bold ph-text-align-left absolute left-3 sm:left-4 top-3.5 sm:top-4 text-slate-400 text-lg z-10 pointer-events-none"></i>
+                                <textarea name="notes" rows="2" placeholder="Catatan tambahan (opsional)..." class="flex-1 w-full min-w-0 block appearance-none box-border pl-9 sm:pl-11 pr-3 sm:pr-4 py-3 sm:py-3.5 rounded-xl bg-slate-50 border border-slate-200 outline-none resize-none text-sm sm:text-base font-semibold text-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"></textarea>
                             </div>
                         </div>
                     </div>
@@ -374,9 +382,9 @@
                         </p>
                     </div>
                     <div class="flex gap-2 sm:gap-3 w-full md:w-auto box-border">
-                        <div class="relative w-full md:w-72 min-w-0 max-w-full">
-                            <i class="ph-bold ph-magnifying-glass absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10"></i>
-                            <input type="text" id="liveSearchInput" placeholder="Cari data..." class="w-full max-w-full box-border pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-xl bg-white border border-slate-200 outline-none text-xs sm:text-sm font-semibold shadow-sm focus:border-indigo-500">
+                        <div class="relative w-full md:w-72 min-w-0 max-w-full flex">
+                            <i class="ph-bold ph-magnifying-glass absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg z-10 pointer-events-none"></i>
+                            <input type="text" id="liveSearchInput" placeholder="Cari data..." class="flex-1 w-full min-w-0 block appearance-none box-border pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-xl bg-white border border-slate-200 outline-none text-xs sm:text-sm font-semibold shadow-sm focus:border-indigo-500">
                         </div>
                         <button onclick="refreshHistory()" class="px-3 sm:px-4 py-2.5 sm:py-3 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-xl font-bold hover:bg-indigo-600 hover:text-white transition-all shrink-0 flex items-center justify-center box-border" title="Refresh">
                             <i class="ph-bold ph-arrows-clockwise text-base sm:text-xl"></i>
