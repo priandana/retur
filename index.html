@@ -63,11 +63,22 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Custom Input Mobile Focus */
+        /* Custom Input Mobile Focus & iOS Fixes */
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--app-primary) !important;
             background-color: white !important;
+        }
+        
+        /* Fix Safari/iOS Date Input Styling */
+        input[type="date"] {
+            -webkit-appearance: none;
+            appearance: none;
+            min-height: 44px; /* Ensure tap target size */
+            background-color: #f8fafc;
+        }
+        input[type="date"]::-webkit-date-and-time-value {
+            text-align: left;
         }
 
         /* Autocomplete positioning */
@@ -137,14 +148,15 @@
                         <i class="ph-fill ph-truck text-indigo-500"></i>
                         <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">Data Armada</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="space-y-1">
+                    <!-- PERBAIKAN: Layout diubah menggunakan flex min-w-0 untuk mencegah overflow pada HP -->
+                    <div class="flex gap-3 w-full">
+                        <div class="space-y-1 flex-1 min-w-0">
                             <label class="text-[10px] font-bold text-slate-500 ml-1">TANGGAL</label>
-                            <input type="date" name="tanggal" required class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold">
+                            <input type="date" name="tanggal" required class="w-full min-w-0 block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-3 py-3 text-sm font-bold text-slate-800">
                         </div>
-                        <div class="space-y-1">
+                        <div class="space-y-1 flex-1 min-w-0">
                             <label class="text-[10px] font-bold text-slate-500 ml-1">NO. POLISI</label>
-                            <input type="text" name="noPol" placeholder="B 1234 ABC" required class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold uppercase placeholder:normal-case">
+                            <input type="text" name="noPol" placeholder="B 1234 ABC" required class="w-full min-w-0 block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-3 py-3 text-sm font-bold text-slate-800 uppercase placeholder:normal-case">
                         </div>
                     </div>
                 </div>
@@ -157,14 +169,14 @@
                     </div>
                     <div class="relative" id="storeSelectContainer">
                         <input type="text" id="storeSearch" name="kodeToko" autocomplete="off" placeholder="Cari Kode Toko..." required 
-                               class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold uppercase">
+                               class="w-full block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold uppercase">
                         <div id="storeOptions" class="custom-select-options absolute w-full mt-1 bg-white border border-slate-100 rounded-xl py-2"></div>
                     </div>
                     <input type="text" id="namaTokoInput" name="namaToko" placeholder="Nama Toko Otomatis..." readonly 
-                           class="w-full bg-slate-100 border-none rounded-xl px-4 py-3 text-sm font-bold text-slate-400 cursor-not-allowed">
+                           class="w-full block appearance-none bg-slate-100 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-400 cursor-not-allowed">
                     <div class="relative" id="groupSelectContainer">
                         <input type="text" id="groupSearch" name="grup" autocomplete="off" placeholder="Pilih Grup Cabang..." required 
-                               class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold uppercase">
+                               class="w-full block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold uppercase">
                         <div id="groupOptions" class="custom-select-options absolute w-full mt-1 bg-white border border-slate-100 rounded-xl py-2"></div>
                     </div>
                 </div>
@@ -177,16 +189,19 @@
                     </div>
                     <div class="relative" id="productSelectContainer">
                         <input type="text" id="productSearch" name="deskripsi" autocomplete="off" placeholder="Cari Nama Produk / SKU..." required 
-                               class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold">
+                               class="w-full block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold">
                         <div id="productOptions" class="custom-select-options absolute w-full mt-1 bg-white border border-slate-100 rounded-xl py-2"></div>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <select name="kategori" id="categorySelect" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold appearance-none">
-                            <option value="">Pilih Suhu</option>
-                        </select>
-                        <div class="relative">
+                    <!-- PERBAIKAN: Layout Kategori dan QTY juga disesuaikan -->
+                    <div class="flex gap-3 w-full">
+                        <div class="flex-1 min-w-0">
+                            <select name="kategori" id="categorySelect" class="w-full min-w-0 block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-3 py-3 text-sm font-bold text-slate-800">
+                                <option value="">Pilih Suhu</option>
+                            </select>
+                        </div>
+                        <div class="relative flex-1 min-w-0">
                             <input type="number" id="qtyInput" name="qty" placeholder="QTY" required min="1" 
-                                   class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-black text-indigo-600 text-center">
+                                   class="w-full min-w-0 block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-3 py-3 text-sm font-black text-indigo-600 text-center">
                             <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400">PCS</span>
                         </div>
                     </div>
@@ -204,14 +219,14 @@
                             <input type="checkbox" id="fakturCheckbox" name="fakturCheckbox" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300">
                         </label>
                     </div>
-                    <select name="keterangan" id="ketInput" required class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold">
+                    <select name="keterangan" id="ketInput" required class="w-full block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-800">
                         <option value="" disabled selected>Pilih Alasan Balikan</option>
                         <option value="SJI">SJI</option>
                         <option value="GAGAL KIRIM">GAGAL KIRIM</option>
                         <option value="SUSULAN">SUSULAN</option>
                     </select>
                     <textarea name="notes" rows="2" placeholder="Catatan tambahan..." 
-                              class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium resize-none"></textarea>
+                              class="w-full block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 resize-none"></textarea>
                 </div>
 
                 <!-- Action Button -->
