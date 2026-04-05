@@ -218,7 +218,7 @@
             </button>
         </header>
 
-        <!-- FIX: pb-[150px] memberi padding lega di bawah konten, sehingga tombol bisa di scroll melewati nav bar -->
+        <!-- FIX: pb-[150px] memberi padding lega di bawah konten -->
         <main class="px-5 pb-[150px]">
             
             <!-- Tab 1: Input -->
@@ -226,7 +226,7 @@
                 
                 <form id="returForm" class="space-y-0">
                     
-                    <!-- Form Utama (Digabung dalam 1 Card Panjang ala Form Pembayaran) -->
+                    <!-- Form Utama -->
                     <div class="app-card p-5 mt-2 relative overflow-hidden">
                         
                         <!-- Header Form -->
@@ -355,7 +355,7 @@
                     </div>
 
                     <!-- Action Button Add to List -->
-                    <div class="pt-2 px-1">
+                    <div class="pt-2 px-1 mb-4">
                         <button type="button" id="mainActionBtn" onclick="handleMainAction()" class="w-full bg-slate-900 text-white rounded-[20px] font-black py-4 shadow-xl shadow-slate-300/50 active:scale-[0.98] transition-transform flex items-center justify-center gap-2 text-[15px]">
                             <i class="ph-bold ph-plus-circle text-xl"></i>
                             Tambah ke Keranjang
@@ -382,6 +382,9 @@
                     </div>
                 </div>
                 
+                <!-- Spacer Ekstra Eksplisit untuk iOS Bottom Bar -->
+                <div class="h-[120px] w-full shrink-0"></div>
+                
             </div>
 
             <!-- Tab 2: Database History -->
@@ -403,6 +406,9 @@
                 <div id="mobileHistoryList" class="space-y-3 pb-4">
                     <!-- History Cards Injected Here -->
                 </div>
+                
+                <!-- Spacer Ekstra Eksplisit untuk iOS Bottom Bar -->
+                <div class="h-[120px] w-full shrink-0"></div>
             </div>
 
             <!-- Tab 3: Analytics -->
@@ -446,6 +452,9 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Spacer Ekstra Eksplisit untuk iOS Bottom Bar -->
+                <div class="h-[120px] w-full shrink-0"></div>
             </div>
 
         </main>
@@ -689,12 +698,14 @@
         async function submitBulkData() {
             if(bulkItems.length === 0) return;
 
+            const totalItems = bulkItems.length;
+
             Swal.fire({
                 html: `
                     <div class="flex flex-col items-center p-4">
                         <div class="w-12 h-12 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin mb-4"></div>
                         <h3 class="text-lg font-black text-slate-800">Menyimpan Transaksi</h3>
-                        <p id="bulkProgressText" class="text-xs font-bold text-slate-500 mt-1">1 dari ${bulkItems.length} data...</p>
+                        <p id="bulkProgressText" class="text-xs font-bold text-slate-500 mt-1">1 dari ${totalItems} data...</p>
                     </div>
                 `,
                 showConfirmButton: false, 
@@ -704,22 +715,41 @@
 
             let successCount = 0;
             
-            for(let i = 0; i < bulkItems.length; i++) {
-                document.getElementById('bulkProgressText').innerText = `${i + 1} dari ${bulkItems.length} data...`;
+            for(let i = 0; i < totalItems; i++) {
+                document.getElementById('bulkProgressText').innerText = `${i + 1} dari ${totalItems} data...`;
                 const payload = { ...bulkItems[i], action: 'submitForm' };
 
                 try {
-                    const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json());
-                    if(res.status === 'success') successCount++;
+                    const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                    
+                    // FIX: Memeriksa apakah request berhasil terkirim saja, karena GAS sering error parse JSON saat di-hit berulang
+                    if (response.ok) {
+                        successCount++;
+                    } else {
+                        // Jika tidak response ok, coba tangkap JSON siapa tau sukses tersimpan 
+                        try {
+                            const res = await response.json();
+                            if(res.status === 'success') successCount++;
+                        } catch(e) {
+                            console.warn("Bukan format JSON dari GAS", e);
+                        }
+                    }
                 } catch (e) {
                     console.error("Gagal", e);
+                }
+                
+                // FIX PENTING: Tambahkan jeda 1 Detik antar data agar sistem Google Spreadsheet tidak kebingungan
+                if (i < totalItems - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                 }
             }
 
             if (successCount > 0) {
                 Swal.fire({
-                    icon: 'success', title: 'Transaksi Sukses!', text: `${successCount} item berhasil dikirim.`,
-                    confirmButtonColor: '#dc2626', customClass: { popup: 'rounded-3xl shadow-2xl', confirmButton: 'rounded-xl font-bold' }
+                    icon: 'success', 
+                    title: 'Transaksi Sukses!', 
+                    confirmButtonColor: '#dc2626', 
+                    customClass: { popup: 'rounded-3xl shadow-2xl', confirmButton: 'rounded-xl font-bold' }
                 });
                 
                 document.getElementById('returForm').reset();
@@ -730,7 +760,7 @@
                 // Set ulang tanggal ke hari ini
                 document.getElementById('tanggalInput').value = new Date().toISOString().split('T')[0];
             } else {
-                Swal.fire('Gagal!', 'Tidak ada data yang berhasil disimpan.', 'error');
+                Swal.fire('Gagal!', 'Tidak ada data yang berhasil disimpan. Periksa koneksi Anda.', 'error');
             }
         }
 
