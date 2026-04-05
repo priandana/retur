@@ -14,297 +14,443 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
         
         :root {
-            --app-primary: #4f46e5;
-            --app-bg: #f8fafc;
+            /* Corporate Red Colors */
+            --app-primary: #dc2626;      /* Tailwind red-600 */
+            --app-primary-dark: #991b1b; /* Tailwind red-800 */
+            --app-bg: #f4f6f9;
         }
 
-        body { 
+        body, html { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background-color: var(--app-bg);
             -webkit-tap-highlight-color: transparent;
-            /* Perbaikan: Jarak bawah diperbesar agar tombol tidak tertutup bottom nav */
-            padding-bottom: calc(120px + env(safe-area-inset-bottom)); 
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; /* Prevent body scroll, use internal scrolling */
         }
 
-        /* Custom Scrollbar */
+        /* E-Wallet Header Background */
+        .header-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 280px;
+            background: linear-gradient(135deg, var(--app-primary), var(--app-primary-dark));
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        /* Decorative Blobs in Header */
+        .header-bg::before {
+            content: '';
+            position: absolute;
+            top: -50px; right: -50px;
+            width: 200px; height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            filter: blur(20px);
+        }
+        .header-bg::after {
+            content: '';
+            position: absolute;
+            bottom: -50px; left: -20px;
+            width: 150px; height: 150px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            filter: blur(15px);
+        }
+
+        /* Custom Scrollbar for internal container */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .scrollable-area {
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: calc(140px + env(safe-area-inset-bottom));
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
 
-        /* Card Style ala Mobile App */
+        /* Premium Floating Card */
         .app-card {
             background: white;
-            border-radius: 20px;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255,255,255,0.8);
+            margin-bottom: 16px;
         }
 
+        /* Modern Input Wrappers (Fixes iOS issues completely) */
+        .input-wrapper {
+            background-color: #f8fafc;
+            border-radius: 16px;
+            padding: 10px 16px;
+            border: 1.5px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .input-wrapper:focus-within {
+            border-color: var(--app-primary);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+        }
+        .input-wrapper input, .input-wrapper select, .input-wrapper textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin-top: 2px;
+            color: #1e293b;
+            font-size: 14px;
+            font-weight: 700;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .input-wrapper input::placeholder, .input-wrapper textarea::placeholder {
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+        /* Safari Date Input alignment fix */
+        input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+
         /* Bottom Nav Transition */
+        .bottom-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-top-left-radius: 32px;
+            border-top-right-radius: 32px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.06);
+        }
+        .nav-btn {
+            color: #94a3b8;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
         .nav-active {
             color: var(--app-primary) !important;
-            transform: translateY(-4px);
+            transform: translateY(-5px);
         }
         .nav-active i {
-            background: #eef2ff;
-            padding: 8px;
-            border-radius: 12px;
+            background: #fef2f2;
+            padding: 10px;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(220, 38, 38, 0.15);
         }
 
         /* Tab Animation */
         .tab-content { display: none; }
         .tab-content.active { 
             display: block; 
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+            animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
         }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Custom Input Mobile Focus & iOS Fixes */
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--app-primary) !important;
-            background-color: white !important;
-        }
-        
-        /* Fix Safari/iOS Date Input Styling */
-        input[type="date"] {
-            -webkit-appearance: none;
-            appearance: none;
-            min-height: 44px; /* Ensure tap target size */
-            background-color: #f8fafc;
-        }
-        input[type="date"]::-webkit-date-and-time-value {
-            text-align: left;
-        }
-
-        /* Autocomplete positioning */
+        /* Autocomplete Box */
         .custom-select-options {
-            max-height: 200px;
+            max-height: 220px;
             overflow-y: auto;
             z-index: 100;
             display: none;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            border-bottom-left-radius: 15px;
-            border-bottom-right-radius: 15px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            margin-top: 8px;
+            background: white;
+            border: 1px solid #f1f5f9;
         }
-        .custom-select-options.active { display: block; }
-
-        /* Loader */
-        #premiumLoader {
-            background: radial-gradient(circle at center, #1e293b, #0f172a);
-        }
+        .custom-select-options.active { display: block; animation: fadeSlideUp 0.2s ease-out; }
     </style>
 </head>
-<body class="text-slate-800">
+<body>
 
     <!-- Premium Loader -->
-    <div id="premiumLoader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-700 w-full h-full">
+    <div id="premiumLoader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-700 w-full h-full bg-slate-900">
         <div class="relative mb-6">
-            <div class="w-20 h-20 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+            <div class="w-20 h-20 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin"></div>
             <div class="absolute inset-0 flex items-center justify-center">
-                <i class="ph-fill ph-rocket-launch text-3xl text-indigo-400"></i>
+                <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center shadow-inner">
+                    <i class="ph-fill ph-rocket-launch text-2xl text-red-400"></i>
+                </div>
             </div>
         </div>
-        <h2 class="text-2xl font-bold text-white tracking-tight">Retur<span class="text-indigo-400">Hub</span></h2>
-        <p class="text-slate-400 text-xs mt-2 tracking-[0.2em] animate-pulse">MEMUAT SISTEM...</p>
+        <h2 class="text-2xl font-black text-white tracking-tight">Retur<span class="text-red-400">Hub</span></h2>
     </div>
 
-    <!-- Top Header -->
-    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 py-4 flex justify-between items-center">
-        <div>
-            <h1 class="text-xl font-extrabold tracking-tight text-slate-900">Retur<span class="text-indigo-600">Hub</span></h1>
-            <p id="headerSubtitle" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Input System v2.0</p>
-        </div>
-        <div class="flex gap-3">
-            <button onclick="refreshHistory()" class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-600 active:scale-90 transition-transform">
-                <i class="ph-bold ph-arrows-clockwise text-xl"></i>
-            </button>
-            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
-                <i class="ph-fill ph-user text-xl"></i>
-            </div>
-        </div>
-    </header>
+    <!-- The E-Wallet Style Header Background -->
+    <div class="header-bg"></div>
 
-    <!-- Main Content Area -->
-    <main class="max-w-xl mx-auto px-4 pt-4">
+    <!-- Main Scrollable Application Area -->
+    <div class="relative z-10 scrollable-area hide-scrollbar" id="mainScrollArea">
         
-        <!-- Tab 1: Input -->
-        <div id="content-input" class="tab-content active">
-            <div class="flex items-center justify-between mb-4 px-2">
-                <h2 id="formTitle" class="text-lg font-extrabold text-slate-800">Formulir Laporan</h2>
-                <button type="button" id="cancelEditBtn" onclick="resetEditMode()" class="hidden text-xs font-bold text-red-500 bg-red-50 px-3 py-1.5 rounded-full">
-                    Batal Edit
-                </button>
-            </div>
-
-            <form id="returForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                <!-- Section: Armada -->
-                <div class="app-card p-5 space-y-4">
-                    <div class="flex items-center gap-2 mb-1">
-                        <i class="ph-fill ph-truck text-indigo-500"></i>
-                        <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">Data Armada</span>
-                    </div>
-                    <!-- PERBAIKAN: Layout diubah menggunakan flex min-w-0 untuk mencegah overflow pada HP -->
-                    <div class="flex gap-3 w-full">
-                        <div class="space-y-1 flex-1 min-w-0">
-                            <label class="text-[10px] font-bold text-slate-500 ml-1">TANGGAL</label>
-                            <input type="date" name="tanggal" required class="w-full min-w-0 block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-3 py-3 text-sm font-bold text-slate-800">
-                        </div>
-                        <div class="space-y-1 flex-1 min-w-0">
-                            <label class="text-[10px] font-bold text-slate-500 ml-1">NO. POLISI</label>
-                            <input type="text" name="noPol" placeholder="B 1234 ABC" required class="w-full min-w-0 block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-3 py-3 text-sm font-bold text-slate-800 uppercase placeholder:normal-case">
-                        </div>
-                    </div>
+        <!-- App Header (User Profile & Title) -->
+        <header class="px-6 pt-12 pb-6 flex justify-between items-center text-white sticky top-0 z-40 transition-all duration-300" id="topHeader">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-[16px] flex items-center justify-center border border-white/20 shadow-lg">
+                    <i class="ph-fill ph-user text-2xl text-white"></i>
                 </div>
-
-                <!-- Section: Lokasi -->
-                <div class="app-card p-5 space-y-4">
-                    <div class="flex items-center gap-2 mb-1">
-                        <i class="ph-fill ph-storefront text-purple-500"></i>
-                        <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">Informasi Toko</span>
-                    </div>
-                    <div class="relative" id="storeSelectContainer">
-                        <input type="text" id="storeSearch" name="kodeToko" autocomplete="off" placeholder="Cari Kode Toko..." required 
-                               class="w-full block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold uppercase">
-                        <div id="storeOptions" class="custom-select-options absolute w-full mt-1 bg-white border border-slate-100 rounded-xl py-2"></div>
-                    </div>
-                    <input type="text" id="namaTokoInput" name="namaToko" placeholder="Nama Toko Otomatis..." readonly 
-                           class="w-full block appearance-none bg-slate-100 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-400 cursor-not-allowed">
-                    <div class="relative" id="groupSelectContainer">
-                        <input type="text" id="groupSearch" name="grup" autocomplete="off" placeholder="Pilih Grup Cabang..." required 
-                               class="w-full block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold uppercase">
-                        <div id="groupOptions" class="custom-select-options absolute w-full mt-1 bg-white border border-slate-100 rounded-xl py-2"></div>
-                    </div>
-                </div>
-
-                <!-- Section: Produk -->
-                <div class="app-card p-5 space-y-4">
-                    <div class="flex items-center gap-2 mb-1">
-                        <i class="ph-fill ph-package text-emerald-500"></i>
-                        <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">Detail Barang</span>
-                    </div>
-                    <div class="relative" id="productSelectContainer">
-                        <input type="text" id="productSearch" name="deskripsi" autocomplete="off" placeholder="Cari Nama Produk / SKU..." required 
-                               class="w-full block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold">
-                        <div id="productOptions" class="custom-select-options absolute w-full mt-1 bg-white border border-slate-100 rounded-xl py-2"></div>
-                    </div>
-                    <!-- PERBAIKAN: Layout Kategori dan QTY juga disesuaikan -->
-                    <div class="flex gap-3 w-full">
-                        <div class="flex-1 min-w-0">
-                            <select name="kategori" id="categorySelect" class="w-full min-w-0 block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-3 py-3 text-sm font-bold text-slate-800">
-                                <option value="">Pilih Suhu</option>
-                            </select>
-                        </div>
-                        <div class="relative flex-1 min-w-0">
-                            <input type="number" id="qtyInput" name="qty" placeholder="QTY" required min="1" 
-                                   class="w-full min-w-0 block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-3 py-3 text-sm font-black text-indigo-600 text-center">
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-400">PCS</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section: Keterangan -->
-                <div class="app-card p-5 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <i class="ph-fill ph-info text-amber-500"></i>
-                            <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">Catatan</span>
-                        </div>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <span id="fakturLabel" class="text-[10px] font-bold text-slate-400 uppercase">Faktur?</span>
-                            <input type="checkbox" id="fakturCheckbox" name="fakturCheckbox" class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300">
-                        </label>
-                    </div>
-                    <select name="keterangan" id="ketInput" required class="w-full block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-800">
-                        <option value="" disabled selected>Pilih Alasan Balikan</option>
-                        <option value="SJI">SJI</option>
-                        <option value="GAGAL KIRIM">GAGAL KIRIM</option>
-                        <option value="SUSULAN">SUSULAN</option>
-                    </select>
-                    <textarea name="notes" rows="2" placeholder="Catatan tambahan..." 
-                              class="w-full block appearance-none bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium text-slate-800 resize-none"></textarea>
-                </div>
-
-                <!-- Action Button -->
-                <div class="flex gap-3 pt-4 pb-8">
-                    <label class="flex-1 bg-white border border-slate-100 rounded-2xl p-3 flex items-center gap-3 shadow-sm active:bg-slate-50 transition-colors cursor-pointer">
-                        <input type="checkbox" id="keepDataCheck" class="w-5 h-5 rounded-full border-slate-300 text-indigo-600 focus:ring-0">
-                        <div class="leading-none">
-                            <p class="text-[11px] font-bold text-slate-800">Multi-Input</p>
-                            <p class="text-[9px] text-slate-400 mt-0.5">Simpan berulang</p>
-                        </div>
-                    </label>
-                    <button type="submit" id="submitBtn" class="flex-[2] bg-indigo-600 text-white rounded-2xl font-bold py-4 shadow-lg shadow-indigo-100 active:scale-95 transition-transform flex items-center justify-center gap-2">
-                        <i class="ph-bold ph-paper-plane-tilt"></i>
-                        Simpan Data
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Tab 2: Database (Mobile Optimized) -->
-        <div id="content-display" class="tab-content">
-            <div class="mb-4">
-                <div class="relative">
-                    <i class="ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="liveSearchInput" placeholder="Cari data riwayat..." 
-                           class="w-full bg-white border-none rounded-2xl pl-11 pr-4 py-3.5 text-sm font-medium shadow-sm">
+                <div>
+                    <h1 class="text-xl font-black tracking-tight leading-none">ReturHub</h1>
+                    <p id="headerSubtitle" class="text-[11px] font-bold text-red-200 uppercase tracking-widest mt-1">Input System</p>
                 </div>
             </div>
+            <button onclick="refreshHistory()" class="w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center transition-colors">
+                <i class="ph-bold ph-arrows-clockwise text-lg text-white"></i>
+            </button>
+        </header>
+
+        <main class="px-5">
             
-            <div id="mobileHistoryList" class="space-y-3 pb-6">
-                <!-- Data will be injected here as Cards -->
-            </div>
-        </div>
+            <!-- Tab 1: Input -->
+            <div id="content-input" class="tab-content active">
+                
+                <form id="returForm" class="space-y-0">
+                    
+                    <!-- Form Utama (Digabung dalam 1 Card Panjang ala Form Pembayaran) -->
+                    <div class="app-card p-5 mt-2 relative overflow-hidden">
+                        
+                        <!-- Header Form -->
+                        <div class="flex items-center justify-between mb-5 border-b border-slate-100 pb-4">
+                            <div>
+                                <h2 id="formTitle" class="text-lg font-black text-slate-800">Form Laporan</h2>
+                                <p class="text-xs font-bold text-slate-400 mt-0.5">Lengkapi data retur armada</p>
+                            </div>
+                            <button type="button" id="cancelEditBtn" onclick="resetEditMode()" class="hidden text-[10px] font-black text-white bg-red-500 px-3 py-1.5 rounded-xl uppercase tracking-wider shadow-md shadow-red-200">
+                                Batal
+                            </button>
+                        </div>
 
-        <!-- Tab 3: Analytics -->
-        <div id="content-dashboard" class="tab-content">
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <div class="app-card p-4 bg-indigo-600 text-white">
-                    <p class="text-[10px] font-bold uppercase opacity-60">Total Item</p>
-                    <h3 id="stat-total" class="text-2xl font-black mt-1">0</h3>
-                </div>
-                <div class="app-card p-4 bg-emerald-500 text-white">
-                    <p class="text-[10px] font-bold uppercase opacity-60">Total Qty</p>
-                    <h3 id="stat-qty" class="text-2xl font-black mt-1">0</h3>
-                </div>
-            </div>
+                        <!-- 1. Armada Group -->
+                        <div class="mb-6">
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center"><i class="ph-fill ph-truck text-red-600 text-xs"></i></div>
+                                <span class="text-xs font-black uppercase tracking-widest text-slate-800">Data Armada</span>
+                            </div>
+                            
+                            <div class="flex gap-3 w-full">
+                                <div class="input-wrapper flex-1 min-w-0">
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Tanggal</label>
+                                    <input type="date" name="tanggal" required>
+                                </div>
+                                <div class="input-wrapper flex-1 min-w-0">
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">No. Polisi</label>
+                                    <input type="text" name="noPol" placeholder="B 1234 ABC" required class="uppercase placeholder:normal-case">
+                                </div>
+                            </div>
+                        </div>
 
-            <div class="space-y-4">
-                <div class="app-card p-5">
-                    <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Top 5 Armada</h4>
-                    <div class="h-60">
-                        <canvas id="chartArmada"></canvas>
+                        <!-- 2. Toko Group (Keep Colors for Sections) -->
+                        <div class="mb-6">
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center"><i class="ph-fill ph-storefront text-purple-600 text-xs"></i></div>
+                                <span class="text-xs font-black uppercase tracking-widest text-slate-800">Lokasi Toko</span>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="relative" id="storeSelectContainer">
+                                    <div class="input-wrapper">
+                                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Kode Toko</label>
+                                        <input type="text" id="storeSearch" name="kodeToko" autocomplete="off" placeholder="Ketik kode..." required class="uppercase">
+                                    </div>
+                                    <div id="storeOptions" class="custom-select-options absolute w-full"></div>
+                                </div>
+                                
+                                <div class="flex gap-3 w-full">
+                                    <div class="input-wrapper flex-[2] min-w-0 bg-slate-100/70 border-slate-200">
+                                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Nama Toko</label>
+                                        <input type="text" id="namaTokoInput" name="namaToko" placeholder="Otomatis..." readonly class="text-slate-500 cursor-not-allowed">
+                                    </div>
+                                    <div class="relative flex-1 min-w-0" id="groupSelectContainer">
+                                        <div class="input-wrapper h-full">
+                                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Grup</label>
+                                            <input type="text" id="groupSearch" name="grup" autocomplete="off" placeholder="Pilih..." required class="uppercase">
+                                        </div>
+                                        <div id="groupOptions" class="custom-select-options absolute w-full right-0"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Produk Group -->
+                        <div class="mb-6">
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center"><i class="ph-fill ph-package text-emerald-600 text-xs"></i></div>
+                                <span class="text-xs font-black uppercase tracking-widest text-slate-800">Detail Barang</span>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="relative" id="productSelectContainer">
+                                    <div class="input-wrapper">
+                                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Nama Produk / SKU</label>
+                                        <input type="text" id="productSearch" name="deskripsi" autocomplete="off" placeholder="Cari barang..." required>
+                                    </div>
+                                    <div id="productOptions" class="custom-select-options absolute w-full"></div>
+                                </div>
+                                
+                                <div class="flex gap-3 w-full">
+                                    <div class="input-wrapper flex-[2] min-w-0">
+                                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Suhu</label>
+                                        <select name="kategori" id="categorySelect" class="pr-6">
+                                            <option value="">Pilih...</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-wrapper flex-1 min-w-0 !border-red-100 !bg-red-50/50 relative">
+                                        <label class="text-[9px] font-black text-red-400 uppercase tracking-widest block text-center">QTY</label>
+                                        <input type="number" id="qtyInput" name="qty" placeholder="0" required min="1" class="text-center text-xl !text-red-600">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Keterangan Group -->
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center"><i class="ph-fill ph-info text-amber-600 text-xs"></i></div>
+                                    <span class="text-xs font-black uppercase tracking-widest text-slate-800">Catatan</span>
+                                </div>
+                                <label class="flex items-center gap-2 cursor-pointer bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
+                                    <span id="fakturLabel" class="text-[10px] font-bold text-slate-500 uppercase">Ada Faktur?</span>
+                                    <input type="checkbox" id="fakturCheckbox" name="fakturCheckbox" class="w-4 h-4 rounded text-red-600 focus:ring-red-500 border-slate-300">
+                                </label>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="input-wrapper">
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Alasan Retur</label>
+                                    <select name="keterangan" id="ketInput" required>
+                                        <option value="" disabled selected>Pilih alasan...</option>
+                                        <option value="SJI">SJI</option>
+                                        <option value="GAGAL KIRIM">GAGAL KIRIM</option>
+                                        <option value="SUSULAN">SUSULAN</option>
+                                    </select>
+                                </div>
+                                <div class="input-wrapper">
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Keterangan Opsional</label>
+                                    <textarea name="notes" rows="1" placeholder="Ketik jika ada..." class="resize-none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- Action Button Add to List -->
+                    <div class="pt-2 px-1">
+                        <button type="button" id="mainActionBtn" onclick="handleMainAction()" class="w-full bg-slate-900 text-white rounded-[20px] font-black py-4 shadow-xl shadow-slate-300/50 active:scale-[0.98] transition-transform flex items-center justify-center gap-2 text-[15px]">
+                            <i class="ph-bold ph-plus-circle text-xl"></i>
+                            Tambah ke Keranjang
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Bulk/Keranjang List Container -->
+                <div id="bulkContainer" class="hidden mt-6 mb-4">
+                    <div class="flex items-center justify-between px-2 mb-3">
+                        <h3 class="text-sm font-black text-slate-800">Keranjang Input</h3>
+                        <span class="bg-red-100 text-red-700 text-[10px] font-black px-2.5 py-1 rounded-full"><span id="bulkCount">0</span> Item</span>
+                    </div>
+                    
+                    <div id="bulkList" class="space-y-3 max-h-[350px] overflow-y-auto hide-scrollbar pb-2">
+                        <!-- Item bulk Card -->
+                    </div>
+
+                    <div class="px-1 mt-4">
+                        <button type="button" onclick="submitBulkData()" class="w-full bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-[20px] font-black py-4 shadow-xl shadow-red-200 active:scale-[0.98] transition-transform flex items-center justify-center gap-2 text-[15px]">
+                            <i class="ph-bold ph-paper-plane-tilt text-xl"></i>
+                            Kirim Semua Data
+                        </button>
                     </div>
                 </div>
-                <div class="app-card p-5">
-                    <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Distribusi Suhu</h4>
-                    <div class="h-60">
-                        <canvas id="chartSuhu"></canvas>
+            </div>
+
+            <!-- Tab 2: Database History -->
+            <div id="content-display" class="tab-content">
+                
+                <!-- Search & Filter Card -->
+                <div class="app-card p-4 mt-2 mb-6">
+                    <div class="input-wrapper flex items-center gap-2 !p-3">
+                        <i class="ph-bold ph-magnifying-glass text-slate-400 text-lg"></i>
+                        <input type="text" id="liveSearchInput" placeholder="Cari histori retur..." class="!mt-0">
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <h3 class="text-sm font-black text-slate-800">Riwayat Terakhir</h3>
+                    <span class="text-[10px] font-bold text-slate-400 bg-slate-200 px-2 py-1 rounded-full">20 Data</span>
+                </div>
+
+                <div id="mobileHistoryList" class="space-y-3 pb-4">
+                    <!-- History Cards Injected Here -->
+                </div>
+            </div>
+
+            <!-- Tab 3: Analytics -->
+            <div id="content-dashboard" class="tab-content">
+                
+                <!-- KPI Balance Style -->
+                <div class="app-card p-6 mt-2 mb-6 bg-gradient-to-br from-red-600 to-rose-700 text-white border-none shadow-xl shadow-red-200">
+                    <p class="text-xs font-bold text-red-200 uppercase tracking-widest mb-1">Total Kuantitas Retur</p>
+                    <div class="flex items-end gap-2">
+                        <h3 id="stat-qty" class="text-4xl font-black leading-none">0</h3>
+                        <span class="text-sm font-bold text-red-200 mb-1">Pcs</span>
+                    </div>
+                    <div class="mt-6 pt-5 border-t border-white/20 flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] font-bold text-red-200 uppercase">Total Entri Data</p>
+                            <h4 id="stat-total" class="text-lg font-black">0</h4>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                            <i class="ph-fill ph-chart-line-up text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="app-card p-5">
+                        <div class="flex items-center justify-between mb-6">
+                            <h4 class="text-sm font-black text-slate-800">Top 5 Armada</h4>
+                            <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center"><i class="ph-bold ph-truck text-slate-400"></i></div>
+                        </div>
+                        <div class="h-48">
+                            <canvas id="chartArmada"></canvas>
+                        </div>
+                    </div>
+                    <div class="app-card p-5">
+                        <div class="flex items-center justify-between mb-6">
+                            <h4 class="text-sm font-black text-slate-800">Distribusi Suhu</h4>
+                            <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center"><i class="ph-bold ph-thermometer text-slate-400"></i></div>
+                        </div>
+                        <div class="h-48 flex justify-center">
+                            <canvas id="chartSuhu"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-    </main>
+        </main>
+    </div>
 
-    <!-- Bottom Navigation Bar -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-6 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex justify-between items-center z-[50] shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
-        <button onclick="switchTab('input')" id="tab-input" class="nav-btn flex flex-col items-center gap-1 text-slate-400 nav-active transition-all">
-            <i class="ph-bold ph-pencil-simple text-xl"></i>
-            <span class="text-[10px] font-bold">Input</span>
+    <!-- E-Wallet Style Bottom Navigation -->
+    <nav class="bottom-nav fixed bottom-0 left-0 right-0 px-6 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] flex justify-between items-center z-[50]">
+        <button onclick="switchTab('input')" id="tab-input" class="nav-btn flex flex-col items-center gap-1 w-20 nav-active">
+            <i class="ph-bold ph-pencil-simple text-2xl"></i>
+            <span class="text-[10px] font-bold mt-1">Input</span>
         </button>
-        <button onclick="switchTab('display')" id="tab-display" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition-all">
-            <i class="ph-bold ph-database text-xl"></i>
-            <span class="text-[10px] font-bold">Riwayat</span>
+        <button onclick="switchTab('display')" id="tab-display" class="nav-btn flex flex-col items-center gap-1 w-20">
+            <i class="ph-bold ph-clock-counter-clockwise text-2xl"></i>
+            <span class="text-[10px] font-bold mt-1">Riwayat</span>
         </button>
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-btn flex flex-col items-center gap-1 text-slate-400 transition-all">
-            <i class="ph-bold ph-chart-pie-slice text-xl"></i>
-            <span class="text-[10px] font-bold">Analitik</span>
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-btn flex flex-col items-center gap-1 w-20">
+            <i class="ph-bold ph-chart-pie-slice text-2xl"></i>
+            <span class="text-[10px] font-bold mt-1">Analitik</span>
         </button>
     </nav>
 
@@ -316,6 +462,7 @@
         let armadaChartInstance = null;
         let suhuChartInstance = null;
         let currentEditRowIndex = null; 
+        let bulkItems = [];
 
         window.onload = function() {
             if (!SCRIPT_URL) {
@@ -332,6 +479,19 @@
                     document.getElementById('premiumLoader').style.display = 'none';
                     Swal.fire('Koneksi Gagal', 'Pastikan URL GAS benar.', 'error');
                 });
+                
+            // Handle header background scroll effect
+            const scrollArea = document.getElementById('mainScrollArea');
+            const header = document.getElementById('topHeader');
+            scrollArea.addEventListener('scroll', () => {
+                if(scrollArea.scrollTop > 50) {
+                    header.classList.add('bg-red-700/90', 'shadow-md', 'backdrop-blur-xl', 'pb-4');
+                    header.classList.remove('pb-6');
+                } else {
+                    header.classList.remove('bg-red-700/90', 'shadow-md', 'backdrop-blur-xl', 'pb-4');
+                    header.classList.add('pb-6');
+                }
+            });
         };
 
         function initApp(data) {
@@ -341,18 +501,24 @@
 
             // Setup Custom Selects
             setupCustomSelect('storeSearch', 'storeOptions', data.stores, false, (sel) => {
-                if(sel) document.getElementById('namaTokoInput').value = sel.nama || '';
+                if(sel) {
+                    document.getElementById('namaTokoInput').value = sel.nama || '';
+                    document.getElementById('groupSearch').focus(); // Auto next field
+                }
             });
 
             setupCustomSelect('productSearch', 'productOptions', data.products, true, (sel) => {
                 if(sel && sel.cat) {
                     const catSelect = document.getElementById('categorySelect');
                     catSelect.value = sel.cat.toUpperCase();
+                    document.getElementById('qtyInput').focus(); // Auto next field
                 }
             });
 
             const uniqueGroups = [...new Set(data.stores.map(s => s.grup).filter(Boolean))].sort();
-            setupCustomSelect('groupSearch', 'groupOptions', uniqueGroups);
+            setupCustomSelect('groupSearch', 'groupOptions', uniqueGroups, false, () => {
+                document.getElementById('productSearch').focus(); // Auto next field
+            });
 
             const catSelect = document.getElementById('categorySelect');
             catSelect.innerHTML = '<option value="">Pilih Suhu</option>' + 
@@ -376,16 +542,16 @@
                 
                 filtered.forEach(item => {
                     const div = document.createElement('div');
-                    div.className = 'px-4 py-3 border-b border-slate-50 last:border-0 active:bg-indigo-50';
+                    div.className = 'px-4 py-3 border-b border-slate-50 last:border-0 active:bg-red-50';
                     
                     if(isProduct) {
-                        div.innerHTML = `<div class="font-bold text-sm text-slate-800">${item.label}</div>
-                                         <div class="text-[10px] text-slate-400">SKU: ${item.sub} | <span class="text-indigo-500">${item.cat}</span></div>`;
+                        div.innerHTML = `<div class="font-black text-sm text-slate-800">${item.label}</div>
+                                         <div class="text-[10px] font-bold text-slate-400 mt-0.5">SKU: ${item.sub} | <span class="text-red-500">${item.cat}</span></div>`;
                     } else if (typeof item === 'string') {
-                        div.innerHTML = `<div class="font-bold text-sm text-slate-800 uppercase">${item}</div>`;
+                        div.innerHTML = `<div class="font-black text-sm text-slate-800 uppercase">${item}</div>`;
                     } else {
-                        div.innerHTML = `<div class="font-bold text-sm text-slate-800">${item.label}</div>
-                                         <div class="text-[10px] text-slate-400">${item.nama}</div>`;
+                        div.innerHTML = `<div class="font-black text-sm text-slate-800">${item.label}</div>
+                                         <div class="text-[10px] font-bold text-slate-400 mt-0.5">${item.nama}</div>`;
                     }
 
                     div.onclick = () => {
@@ -414,105 +580,160 @@
 
             if (tab === 'display' || tab === 'dashboard') refreshHistory();
             
-            // Auto update header subtitle
-            const titles = { 'input': 'Input System v2.0', 'display': 'Database Riwayat', 'dashboard': 'Data Analytics' };
+            const titles = { 'input': 'Input System', 'display': 'History Transaksi', 'dashboard': 'Analitik Cerdas' };
             document.getElementById('headerSubtitle').innerText = titles[tab];
+            
+            // Scroll top
+            document.getElementById('mainScrollArea').scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        function refreshHistory() {
-            if (!SCRIPT_URL) return;
-            fetch(`${SCRIPT_URL}?action=getDataHistory`)
-                .then(r => r.json())
-                .then(data => {
-                    rawHistoryData = data || [];
-                    renderHistoryList(rawHistoryData);
-                    buildDashboard(rawHistoryData);
-                });
+        // ==========================================
+        // BULK INPUT LOGIC
+        // ==========================================
+
+        function handleMainAction() {
+            const form = document.getElementById('returForm');
+            if (!form.reportValidity()) return;
+
+            const data = Object.fromEntries(new FormData(form).entries());
+            data.faktur = document.getElementById('fakturCheckbox').checked;
+
+            if (currentEditRowIndex !== null) {
+                submitSingleEdit(data);
+            } else {
+                addBulkItem(data);
+            }
         }
 
-        function renderHistoryList(data) {
-            const list = document.getElementById('mobileHistoryList');
-            if (!data.length) {
-                list.innerHTML = `<div class="text-center py-20 text-slate-300">
-                                    <i class="ph-bold ph-tray text-4xl"></i>
-                                    <p class="text-xs font-bold mt-2">Belum ada riwayat</p>
-                                  </div>`;
+        function addBulkItem(data) {
+            bulkItems.push(data);
+            renderBulkItems();
+
+            // Clear produk
+            document.getElementById('productSearch').value = '';
+            document.getElementById('categorySelect').value = '';
+            document.getElementById('qtyInput').value = '';
+            document.getElementById('ketInput').value = '';
+            document.querySelector('textarea[name="notes"]').value = '';
+            document.getElementById('fakturCheckbox').checked = false;
+            
+            // Animasi scroll ke keranjang
+            const scrollArea = document.getElementById('mainScrollArea');
+            setTimeout(() => {
+                scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
+            }, 100);
+            
+            // SweetAlert modern toast
+            const Toast = Swal.mixin({
+                toast: true, position: 'top', showConfirmButton: false, timer: 1500,
+                customClass: { popup: 'rounded-2xl shadow-xl border border-slate-100' }
+            });
+            Toast.fire({ icon: 'success', title: 'Masuk Keranjang' });
+        }
+
+        function renderBulkItems() {
+            const container = document.getElementById('bulkContainer');
+            const list = document.getElementById('bulkList');
+            const count = document.getElementById('bulkCount');
+            
+            if (bulkItems.length === 0) {
+                container.classList.add('hidden');
                 return;
             }
+            
+            container.classList.remove('hidden');
+            count.innerText = bulkItems.length;
 
-            list.innerHTML = data.slice(0, 30).map(row => `
-                <div class="app-card p-4 flex justify-between items-start gap-4">
+            list.innerHTML = bulkItems.map((item, index) => `
+                <div class="bg-white rounded-[20px] p-4 shadow-sm border border-slate-100 flex items-center gap-4 animate-[fadeSlideUp_0.3s_ease-out]">
+                    <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center shrink-0">
+                        <i class="ph-fill ph-package text-xl text-red-500"></i>
+                    </div>
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-[10px] font-black bg-slate-100 text-slate-600 px-2 py-0.5 rounded">${row.noPol}</span>
-                            <span class="text-[9px] font-bold text-slate-400">${row.tanggalTampil}</span>
-                        </div>
-                        <h4 class="text-sm font-bold text-slate-800 truncate">${row.deskripsi}</h4>
-                        <p class="text-[10px] text-slate-500 truncate mt-0.5">${row.namaToko} (${row.kodeToko})</p>
-                        <div class="flex items-center gap-2 mt-2">
-                            <span class="text-[8px] font-extrabold border border-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded uppercase">${row.kategori}</span>
-                            <span class="text-[8px] font-extrabold border border-amber-100 text-amber-600 px-1.5 py-0.5 rounded uppercase">${row.ket || 'N/A'}</span>
+                        <h4 class="text-sm font-black text-slate-800 truncate">${item.deskripsi}</h4>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[9px] font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full uppercase">${item.kategori || '-'}</span>
+                            <span class="text-[9px] font-black bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full uppercase">${item.ket || '-'}</span>
                         </div>
                     </div>
-                    <div class="flex flex-col items-end gap-3">
-                        <div class="bg-indigo-50 text-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs">
-                            ${row.qty}
-                        </div>
-                        <button onclick="editData(${row.rowIndex})" class="text-amber-500 active:scale-90 transition-transform">
-                            <i class="ph-bold ph-pencil-simple text-xl"></i>
-                        </button>
+                    <div class="flex flex-col items-end gap-2 shrink-0">
+                        <span class="text-lg font-black text-red-600 leading-none">${item.qty}<span class="text-[10px] text-slate-400 ml-0.5">pcs</span></span>
+                        <button type="button" onclick="removeBulkItem(${index})" class="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-1 rounded-lg active:scale-95">Hapus</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        document.getElementById('liveSearchInput').oninput = (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = rawHistoryData.filter(r => 
-                (r.noPol + r.deskripsi + r.namaToko + r.kodeToko).toLowerCase().includes(term)
-            );
-            renderHistoryList(filtered);
-        };
+        function removeBulkItem(index) {
+            bulkItems.splice(index, 1);
+            renderBulkItems();
+        }
 
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            const form = e.target;
-            const data = Object.fromEntries(new FormData(form).entries());
-            const isEditing = currentEditRowIndex !== null;
+        async function submitBulkData() {
+            if(bulkItems.length === 0) return;
 
             Swal.fire({
-                title: 'Mengirim Data...',
-                html: '<div class="flex justify-center p-4"><div class="w-10 h-10 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div></div>',
-                showConfirmButton: false, allowOutsideClick: false
+                html: `
+                    <div class="flex flex-col items-center p-4">
+                        <div class="w-12 h-12 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin mb-4"></div>
+                        <h3 class="text-lg font-black text-slate-800">Menyimpan Transaksi</h3>
+                        <p id="bulkProgressText" class="text-xs font-bold text-slate-500 mt-1">1 dari ${bulkItems.length} data...</p>
+                    </div>
+                `,
+                showConfirmButton: false, 
+                allowOutsideClick: false,
+                customClass: { popup: 'rounded-3xl shadow-2xl' }
             });
 
-            const payload = {
-                ...data,
-                faktur: document.getElementById('fakturCheckbox').checked,
-                action: isEditing ? 'updateForm' : 'submitForm',
-                rowIndex: currentEditRowIndex
-            };
+            let successCount = 0;
+            
+            for(let i = 0; i < bulkItems.length; i++) {
+                document.getElementById('bulkProgressText').innerText = `${i + 1} dari ${bulkItems.length} data...`;
+                const payload = { ...bulkItems[i], action: 'submitForm' };
 
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            })
+                try {
+                    const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json());
+                    if(res.status === 'success') successCount++;
+                } catch (e) {
+                    console.error("Gagal", e);
+                }
+            }
+
+            if (successCount > 0) {
+                Swal.fire({
+                    icon: 'success', title: 'Transaksi Sukses!', text: `${successCount} item berhasil dikirim.`,
+                    confirmButtonColor: '#dc2626', customClass: { popup: 'rounded-3xl shadow-2xl', confirmButton: 'rounded-xl font-bold' }
+                });
+                
+                document.getElementById('returForm').reset();
+                bulkItems = [];
+                renderBulkItems();
+                refreshHistory();
+            } else {
+                Swal.fire('Gagal!', 'Tidak ada data yang berhasil disimpan.', 'error');
+            }
+        }
+
+        // ==========================================
+        // SINGLE EDIT & HISTORY
+        // ==========================================
+
+        function submitSingleEdit(data) {
+            Swal.fire({
+                html: '<div class="flex flex-col items-center p-4"><div class="w-12 h-12 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin mb-4"></div><h3 class="text-lg font-black text-slate-800">Update Data...</h3></div>',
+                showConfirmButton: false, allowOutsideClick: false, customClass: { popup: 'rounded-3xl' }
+            });
+
+            const payload = { ...data, action: 'updateForm', rowIndex: currentEditRowIndex };
+
+            fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
             .then(r => r.json())
             .then(res => {
                 if(res.status === 'success') {
-                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Laporan telah tersimpan.', timer: 1500, showConfirmButton: false });
-                    
-                    if(isEditing) {
-                        resetEditMode();
-                        switchTab('display');
-                    } else if (!document.getElementById('keepDataCheck').checked) {
-                        form.reset();
-                    } else {
-                        // Keep armada but reset product
-                        document.getElementById('productSearch').value = '';
-                        document.getElementById('qtyInput').value = '';
-                    }
+                    Swal.fire({ icon: 'success', title: 'Updated!', timer: 1500, showConfirmButton: false, customClass: { popup: 'rounded-3xl' } });
+                    resetEditMode();
                     refreshHistory();
+                    switchTab('display');
                 } else {
                     Swal.fire('Error', res.message, 'error');
                 }
@@ -536,22 +757,80 @@
             document.querySelector('textarea[name="notes"]').value = r.notes || '';
 
             currentEditRowIndex = idx;
-            document.getElementById('formTitle').innerText = "Edit Data #" + idx;
+            document.getElementById('formTitle').innerText = "Edit Riwayat";
             document.getElementById('cancelEditBtn').classList.remove('hidden');
-            document.getElementById('submitBtn').innerText = "Update Data";
-            document.getElementById('submitBtn').classList.replace('bg-indigo-600', 'bg-amber-500');
+            
+            const mainBtn = document.getElementById('mainActionBtn');
+            mainBtn.innerHTML = '<i class="ph-bold ph-pencil-simple text-xl"></i> Simpan Perubahan';
+            mainBtn.classList.replace('bg-slate-900', 'bg-amber-500');
 
+            document.getElementById('bulkContainer').classList.add('hidden');
             switchTab('input');
         }
 
         function resetEditMode() {
             currentEditRowIndex = null;
             document.getElementById('returForm').reset();
-            document.getElementById('formTitle').innerText = "Formulir Laporan";
+            document.getElementById('formTitle').innerText = "Form Laporan";
             document.getElementById('cancelEditBtn').classList.add('hidden');
-            document.getElementById('submitBtn').innerText = "Simpan Data";
-            document.getElementById('submitBtn').classList.replace('bg-amber-500', 'bg-indigo-600');
+            
+            const mainBtn = document.getElementById('mainActionBtn');
+            mainBtn.innerHTML = '<i class="ph-bold ph-plus-circle text-xl"></i> Tambah ke Keranjang';
+            mainBtn.classList.replace('bg-amber-500', 'bg-slate-900');
+
+            renderBulkItems();
         }
+
+        function refreshHistory() {
+            if (!SCRIPT_URL) return;
+            fetch(`${SCRIPT_URL}?action=getDataHistory`)
+                .then(r => r.json())
+                .then(data => {
+                    rawHistoryData = data || [];
+                    renderHistoryList(rawHistoryData);
+                    buildDashboard(rawHistoryData);
+                });
+        }
+
+        // Tampilan Card History ala Riwayat OVO/Gopay
+        function renderHistoryList(data) {
+            const list = document.getElementById('mobileHistoryList');
+            if (!data.length) {
+                list.innerHTML = `<div class="text-center py-20 text-slate-300">
+                                    <i class="ph-bold ph-receipt text-5xl mb-2"></i>
+                                    <p class="text-sm font-bold">Belum ada transaksi</p>
+                                  </div>`;
+                return;
+            }
+
+            list.innerHTML = data.slice(0, 30).map(row => `
+                <div class="app-card p-4 flex items-center gap-4 active:scale-[0.98] transition-transform" onclick="editData(${row.rowIndex})">
+                    <div class="w-12 h-12 rounded-[16px] bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
+                        <i class="ph-fill ph-truck text-2xl text-red-500"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h4 class="text-[13px] font-black text-slate-800 truncate">${row.namaToko}</h4>
+                            <span class="text-[8px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">${row.kodeToko}</span>
+                        </div>
+                        <p class="text-[11px] font-bold text-slate-500 truncate">${row.deskripsi}</p>
+                        <p class="text-[9px] font-medium text-slate-400 mt-1">${row.tanggalTampil} • ${row.noPol}</p>
+                    </div>
+                    <div class="flex flex-col items-end gap-1 shrink-0">
+                        <span class="text-base font-black text-red-600">+${row.qty}</span>
+                        <span class="text-[8px] font-black bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full uppercase">Sukses</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('liveSearchInput').oninput = (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = rawHistoryData.filter(r => 
+                (r.noPol + r.deskripsi + r.namaToko + r.kodeToko).toLowerCase().includes(term)
+            );
+            renderHistoryList(filtered);
+        };
 
         function buildDashboard(data) {
             if(!data.length) return;
@@ -569,12 +848,15 @@
                 type: 'bar',
                 data: {
                     labels: topArmada.map(x => x[0]),
-                    datasets: [{ data: topArmada.map(x => x[1]), backgroundColor: '#6366f1', borderRadius: 8 }]
+                    datasets: [{ data: topArmada.map(x => x[1]), backgroundColor: '#dc2626', borderRadius: 12, barPercentage: 0.6 }]
                 },
                 options: { 
                     responsive: true, maintainAspectRatio: false, 
                     plugins: { legend: { display: false } },
-                    scales: { y: { grid: { display: false } }, x: { grid: { display: false } } }
+                    scales: { 
+                        y: { grid: { borderDash: [4, 4], color: '#f1f5f9' }, border: {display: false}, ticks: {font: {size: 10, weight: 'bold'}, color: '#94a3b8'} }, 
+                        x: { grid: { display: false }, border: {display: false}, ticks: {font: {size: 10, weight: 'bold'}, color: '#64748b'} } 
+                    }
                 }
             });
 
@@ -587,11 +869,11 @@
                 type: 'doughnut',
                 data: {
                     labels: Object.keys(suhus),
-                    datasets: [{ data: Object.values(suhus), backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'] }]
+                    datasets: [{ data: Object.values(suhus), backgroundColor: ['#dc2626', '#8b5cf6', '#10b981', '#f59e0b'], borderWidth: 0 }]
                 },
                 options: { 
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } } }
+                    responsive: true, maintainAspectRatio: false, cutout: '75%',
+                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { size: 10, weight: 'bold' } } } }
                 }
             });
         }
