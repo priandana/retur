@@ -73,9 +73,8 @@
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-            padding-bottom: calc(140px + env(safe-area-inset-bottom));
             scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
+            -webkit-overflow-scrolling: touch; /* Momentum scrolling iOS */
         }
 
         /* Premium Floating Card */
@@ -117,8 +116,18 @@
             color: #cbd5e1;
             font-weight: 600;
         }
-        /* Safari Date Input alignment fix */
-        input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+        
+        /* FIX UNTUK iOS DATE INPUT */
+        .input-wrapper input[type="date"] {
+            -webkit-appearance: none;
+            line-height: normal; /* Paksa line-height normal agar teks muncul di iOS */
+            min-height: 24px;
+            display: block;
+        }
+        input[type="date"]::-webkit-date-and-time-value { 
+            text-align: left; 
+            min-height: 1.5em; /* Cegah collapse jika kosong */
+        }
 
         /* Bottom Nav Transition */
         .bottom-nav {
@@ -238,7 +247,7 @@
                             <div class="flex gap-3 w-full">
                                 <div class="input-wrapper flex-1 min-w-0">
                                     <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Tanggal</label>
-                                    <input type="date" name="tanggal" required>
+                                    <input type="date" name="tanggal" id="tanggalInput" required>
                                 </div>
                                 <div class="input-wrapper flex-1 min-w-0">
                                     <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">No. Polisi</label>
@@ -247,7 +256,7 @@
                             </div>
                         </div>
 
-                        <!-- 2. Toko Group (Keep Colors for Sections) -->
+                        <!-- 2. Toko Group -->
                         <div class="mb-6">
                             <div class="flex items-center gap-2 mb-3">
                                 <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center"><i class="ph-fill ph-storefront text-purple-600 text-xs"></i></div>
@@ -343,7 +352,8 @@
                     </div>
 
                     <!-- Action Button Add to List -->
-                    <div class="pt-2 px-1">
+                    <!-- FIX: Tambahan padding bawah (mb-4) agar memberi ruang lega -->
+                    <div class="pt-2 px-1 mb-4">
                         <button type="button" id="mainActionBtn" onclick="handleMainAction()" class="w-full bg-slate-900 text-white rounded-[20px] font-black py-4 shadow-xl shadow-slate-300/50 active:scale-[0.98] transition-transform flex items-center justify-center gap-2 text-[15px]">
                             <i class="ph-bold ph-plus-circle text-xl"></i>
                             Tambah ke Keranjang
@@ -369,6 +379,10 @@
                         </button>
                     </div>
                 </div>
+                
+                <!-- Spacer Ekstra Eksplisit untuk iOS Bottom Bar -->
+                <div class="h-[120px] w-full shrink-0"></div>
+                
             </div>
 
             <!-- Tab 2: Database History -->
@@ -390,6 +404,9 @@
                 <div id="mobileHistoryList" class="space-y-3 pb-4">
                     <!-- History Cards Injected Here -->
                 </div>
+                
+                <!-- Spacer Ekstra Eksplisit untuk iOS Bottom Bar -->
+                <div class="h-[120px] w-full shrink-0"></div>
             </div>
 
             <!-- Tab 3: Analytics -->
@@ -433,6 +450,9 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Spacer Ekstra Eksplisit untuk iOS Bottom Bar -->
+                <div class="h-[120px] w-full shrink-0"></div>
             </div>
 
         </main>
@@ -465,6 +485,10 @@
         let bulkItems = [];
 
         window.onload = function() {
+            // FIX: Auto-fill Date saat load agar tidak blank di iOS
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('tanggalInput').value = today;
+
             if (!SCRIPT_URL) {
                 Swal.fire('Config Error', 'SCRIPT_URL is missing!', 'error');
                 document.getElementById('premiumLoader').style.display = 'none';
@@ -709,6 +733,9 @@
                 bulkItems = [];
                 renderBulkItems();
                 refreshHistory();
+                
+                // Set ulang tanggal ke hari ini
+                document.getElementById('tanggalInput').value = new Date().toISOString().split('T')[0];
             } else {
                 Swal.fire('Gagal!', 'Tidak ada data yang berhasil disimpan.', 'error');
             }
@@ -771,6 +798,7 @@
         function resetEditMode() {
             currentEditRowIndex = null;
             document.getElementById('returForm').reset();
+            document.getElementById('tanggalInput').value = new Date().toISOString().split('T')[0]; // Set ulang tanggal
             document.getElementById('formTitle').innerText = "Form Laporan";
             document.getElementById('cancelEditBtn').classList.add('hidden');
             
