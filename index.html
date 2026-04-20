@@ -88,7 +88,7 @@
             margin-bottom: 16px;
         }
 
-        /* Modern Input Wrappers (Fixes iOS issues completely) */
+        /* Modern Input Wrappers */
         .input-wrapper {
             background-color: #f8fafc;
             border-radius: 16px;
@@ -131,7 +131,7 @@
             min-height: 1.5em; 
         }
 
-        /* Bottom Nav Transition */
+        /* Bottom Nav */
         .bottom-nav {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
@@ -155,7 +155,7 @@
             box-shadow: 0 4px 10px rgba(220, 38, 38, 0.15);
         }
 
-        /* Tab Animation */
+        /* Animations */
         .tab-content { display: none; }
         .tab-content.active { 
             display: block; 
@@ -196,13 +196,10 @@
         <h2 class="text-2xl font-black text-white tracking-tight">Retur<span class="text-red-400">Hub</span></h2>
     </div>
 
-    <!-- The E-Wallet Style Header Background -->
     <div class="header-bg"></div>
 
-    <!-- Main Scrollable Application Area -->
     <div class="relative z-10 scrollable-area hide-scrollbar" id="mainScrollArea">
         
-        <!-- App Header (User Profile & Title) -->
         <header class="px-6 pt-12 pb-6 flex justify-between items-center text-white sticky top-0 z-40 transition-all duration-300" id="topHeader">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-[16px] flex items-center justify-center border border-white/20 shadow-lg">
@@ -218,7 +215,6 @@
             </button>
         </header>
 
-        <!-- FIX: pb-[150px] memberi padding lega di bawah konten -->
         <main class="px-5 pb-[150px]">
             
             <!-- Tab 1: Input -->
@@ -226,10 +222,8 @@
                 
                 <form id="returForm" class="space-y-0">
                     
-                    <!-- Form Utama -->
                     <div class="app-card p-5 mt-2 relative overflow-hidden">
                         
-                        <!-- Header Form -->
                         <div class="flex items-center justify-between mb-5 border-b border-slate-100 pb-4">
                             <div>
                                 <h2 id="formTitle" class="text-lg font-black text-slate-800">Form Laporan</h2>
@@ -259,18 +253,18 @@
                             </div>
                         </div>
 
-                        <!-- 2. Toko Group -->
+                        <!-- 2. Toko Group (DIUBAH JADI OPSIONAL) -->
                         <div class="mb-6">
                             <div class="flex items-center gap-2 mb-3">
                                 <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center"><i class="ph-fill ph-storefront text-purple-600 text-xs"></i></div>
-                                <span class="text-xs font-black uppercase tracking-widest text-slate-800">Lokasi Toko</span>
+                                <span class="text-xs font-black uppercase tracking-widest text-slate-800">Lokasi Toko <span class="text-[10px] text-slate-400 font-bold lowercase italic">(Opsional)</span></span>
                             </div>
                             
                             <div class="space-y-3">
                                 <div class="relative" id="storeSelectContainer">
                                     <div class="input-wrapper">
                                         <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Kode Toko</label>
-                                        <input type="text" id="storeSearch" name="kodeToko" autocomplete="off" placeholder="Ketik kode..." required class="uppercase">
+                                        <input type="text" id="storeSearch" name="kodeToko" autocomplete="off" placeholder="Ketik kode (opsional)..." class="uppercase">
                                     </div>
                                     <div id="storeOptions" class="custom-select-options absolute w-full"></div>
                                 </div>
@@ -283,7 +277,7 @@
                                     <div class="relative flex-1 min-w-0" id="groupSelectContainer">
                                         <div class="input-wrapper h-full">
                                             <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Grup</label>
-                                            <input type="text" id="groupSearch" name="grup" autocomplete="off" placeholder="Pilih..." required class="uppercase">
+                                            <input type="text" id="groupSearch" name="grup" autocomplete="off" placeholder="Pilih..." class="uppercase">
                                         </div>
                                         <div id="groupOptions" class="custom-select-options absolute w-full right-0"></div>
                                     </div>
@@ -351,7 +345,6 @@
                                 </div>
                             </div>
                         </div>
-                        
                     </div>
 
                     <!-- Action Button Add to List -->
@@ -363,16 +356,13 @@
                     </div>
                 </form>
 
-                <!-- Bulk/Keranjang List Container -->
+                <!-- Bulk Container -->
                 <div id="bulkContainer" class="hidden mt-6">
                     <div class="flex items-center justify-between px-2 mb-3">
                         <h3 class="text-sm font-black text-slate-800">Keranjang Input</h3>
                         <span class="bg-red-100 text-red-700 text-[10px] font-black px-2.5 py-1 rounded-full"><span id="bulkCount">0</span> Item</span>
                     </div>
-                    
-                    <div id="bulkList" class="space-y-3 max-h-[350px] overflow-y-auto hide-scrollbar pb-2">
-                        <!-- Item bulk Card -->
-                    </div>
+                    <div id="bulkList" class="space-y-3 max-h-[350px] overflow-y-auto hide-scrollbar pb-2"></div>
 
                     <div class="px-1 mt-4">
                         <button type="button" onclick="submitBulkData()" class="w-full bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-[20px] font-black py-4 shadow-xl shadow-red-200 active:scale-[0.98] transition-transform flex items-center justify-center gap-2 text-[15px]">
@@ -382,15 +372,11 @@
                     </div>
                 </div>
                 
-                <!-- Spacer Ekstra Eksplisit untuk iOS Bottom Bar -->
                 <div class="h-[120px] w-full shrink-0"></div>
-                
             </div>
 
-            <!-- Tab 2: Database History -->
+            <!-- Tab 2: History -->
             <div id="content-display" class="tab-content">
-                
-                <!-- Search & Filter Card -->
                 <div class="app-card p-4 mt-2 mb-6">
                     <div class="input-wrapper flex items-center gap-2 !p-3">
                         <i class="ph-bold ph-magnifying-glass text-slate-400 text-lg"></i>
@@ -400,21 +386,15 @@
                 
                 <div class="flex items-center justify-between mb-4 px-2">
                     <h3 class="text-sm font-black text-slate-800">Riwayat Terakhir</h3>
-                    <span class="text-[10px] font-bold text-slate-400 bg-slate-200 px-2 py-1 rounded-full">20 Data</span>
+                    <span class="text-[10px] font-bold text-slate-400 bg-slate-200 px-2 py-1 rounded-full">30 Data</span>
                 </div>
 
-                <div id="mobileHistoryList" class="space-y-3 pb-4">
-                    <!-- History Cards Injected Here -->
-                </div>
-                
-                <!-- Spacer Ekstra Eksplisit untuk iOS Bottom Bar -->
+                <div id="mobileHistoryList" class="space-y-3 pb-4"></div>
                 <div class="h-[120px] w-full shrink-0"></div>
             </div>
 
             <!-- Tab 3: Analytics -->
             <div id="content-dashboard" class="tab-content">
-                
-                <!-- KPI Balance Style -->
                 <div class="app-card p-6 mt-2 mb-6 bg-gradient-to-br from-red-600 to-rose-700 text-white border-none shadow-xl shadow-red-200">
                     <p class="text-xs font-bold text-red-200 uppercase tracking-widest mb-1">Total Kuantitas Retur</p>
                     <div class="flex items-end gap-2">
@@ -438,29 +418,24 @@
                             <h4 class="text-sm font-black text-slate-800">Top 5 Armada</h4>
                             <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center"><i class="ph-bold ph-truck text-slate-400"></i></div>
                         </div>
-                        <div class="h-48">
-                            <canvas id="chartArmada"></canvas>
-                        </div>
+                        <div class="h-48"><canvas id="chartArmada"></canvas></div>
                     </div>
                     <div class="app-card p-5">
                         <div class="flex items-center justify-between mb-6">
                             <h4 class="text-sm font-black text-slate-800">Distribusi Suhu</h4>
                             <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center"><i class="ph-bold ph-thermometer text-slate-400"></i></div>
                         </div>
-                        <div class="h-48 flex justify-center">
-                            <canvas id="chartSuhu"></canvas>
-                        </div>
+                        <div class="h-48 flex justify-center"><canvas id="chartSuhu"></canvas></div>
                     </div>
                 </div>
                 
-                <!-- Spacer Ekstra Eksplisit untuk iOS Bottom Bar -->
                 <div class="h-[120px] w-full shrink-0"></div>
             </div>
 
         </main>
     </div>
 
-    <!-- E-Wallet Style Bottom Navigation -->
+    <!-- Bottom Navigation -->
     <nav class="bottom-nav fixed bottom-0 left-0 right-0 px-6 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] flex justify-between items-center z-[50]">
         <button onclick="switchTab('input')" id="tab-input" class="nav-btn flex flex-col items-center gap-1 w-20 nav-active">
             <i class="ph-bold ph-pencil-simple text-2xl"></i>
@@ -477,7 +452,6 @@
     </nav>
 
     <script>
-        // Masukkan URL Web App Google Apps Script Anda
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwvhCwcarGQwnj2OqCCVY9EqI2Yqm0jk-omIp1EUZIvZKlhaSH9tW20_vHXmxHqoB1EMQ/exec"; 
 
         let rawHistoryData = []; 
@@ -487,7 +461,6 @@
         let bulkItems = [];
 
         window.onload = function() {
-            // FIX: Auto-fill Date saat load agar tidak blank di iOS
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('tanggalInput').value = today;
 
@@ -506,7 +479,6 @@
                     Swal.fire('Koneksi Gagal', 'Pastikan URL GAS benar.', 'error');
                 });
                 
-            // Handle header background scroll effect
             const scrollArea = document.getElementById('mainScrollArea');
             const header = document.getElementById('topHeader');
             scrollArea.addEventListener('scroll', () => {
@@ -525,25 +497,23 @@
             loader.style.opacity = '0';
             setTimeout(() => { loader.style.display = 'none'; }, 500);
 
-            // Setup Custom Selects
             setupCustomSelect('storeSearch', 'storeOptions', data.stores, false, (sel) => {
                 if(sel) {
                     document.getElementById('namaTokoInput').value = sel.nama || '';
-                    document.getElementById('groupSearch').focus(); // Auto next field
+                    document.getElementById('groupSearch').focus();
                 }
             });
 
             setupCustomSelect('productSearch', 'productOptions', data.products, true, (sel) => {
                 if(sel && sel.cat) {
-                    const catSelect = document.getElementById('categorySelect');
-                    catSelect.value = sel.cat.toUpperCase();
-                    document.getElementById('qtyInput').focus(); // Auto next field
+                    document.getElementById('categorySelect').value = sel.cat.toUpperCase();
+                    document.getElementById('qtyInput').focus();
                 }
             });
 
             const uniqueGroups = [...new Set(data.stores.map(s => s.grup).filter(Boolean))].sort();
             setupCustomSelect('groupSearch', 'groupOptions', uniqueGroups, false, () => {
-                document.getElementById('productSearch').focus(); // Auto next field
+                document.getElementById('productSearch').focus();
             });
 
             const catSelect = document.getElementById('categorySelect');
@@ -580,7 +550,6 @@
                                          <div class="text-[10px] font-bold text-slate-400 mt-0.5">${item.nama}</div>`;
                     }
 
-                    // FIX: Stop propagation to prevent document click listener from instantly closing the auto-focused next input
                     div.onclick = (e) => {
                         e.stopPropagation(); 
                         input.value = (typeof item === 'string') ? item : item.label;
@@ -593,7 +562,6 @@
 
             input.oninput = (e) => filter(e.target.value);
             input.onfocus = () => { container.classList.add('active'); filter(input.value); };
-            
             document.addEventListener('click', (e) => {
                 if (!input.parentElement.contains(e.target)) container.classList.remove('active');
             });
@@ -602,30 +570,19 @@
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
-            
             document.getElementById(`content-${tab}`).classList.add('active');
             document.getElementById(`tab-${tab}`).classList.add('nav-active');
-
             if (tab === 'display' || tab === 'dashboard') refreshHistory();
-            
             const titles = { 'input': 'Input System', 'display': 'History Transaksi', 'dashboard': 'Analitik Cerdas' };
             document.getElementById('headerSubtitle').innerText = titles[tab];
-            
-            // Scroll top
             document.getElementById('mainScrollArea').scrollTo({top: 0, behavior: 'smooth'});
         }
-
-        // ==========================================
-        // BULK INPUT LOGIC
-        // ==========================================
 
         function handleMainAction() {
             const form = document.getElementById('returForm');
             if (!form.reportValidity()) return;
-
             const data = Object.fromEntries(new FormData(form).entries());
             data.faktur = document.getElementById('fakturCheckbox').checked;
-
             if (currentEditRowIndex !== null) {
                 submitSingleEdit(data);
             } else {
@@ -636,26 +593,15 @@
         function addBulkItem(data) {
             bulkItems.push(data);
             renderBulkItems();
-
-            // Clear produk
             document.getElementById('productSearch').value = '';
             document.getElementById('categorySelect').value = '';
             document.getElementById('qtyInput').value = '';
             document.getElementById('ketInput').value = '';
             document.querySelector('textarea[name="notes"]').value = '';
             document.getElementById('fakturCheckbox').checked = false;
-            
-            // Animasi scroll ke keranjang
             const scrollArea = document.getElementById('mainScrollArea');
-            setTimeout(() => {
-                scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' });
-            }, 100);
-            
-            // SweetAlert modern toast
-            const Toast = Swal.mixin({
-                toast: true, position: 'top', showConfirmButton: false, timer: 1500,
-                customClass: { popup: 'rounded-2xl shadow-xl border border-slate-100' }
-            });
+            setTimeout(() => { scrollArea.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' }); }, 100);
+            const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 1500 });
             Toast.fire({ icon: 'success', title: 'Masuk Keranjang' });
         }
 
@@ -663,15 +609,9 @@
             const container = document.getElementById('bulkContainer');
             const list = document.getElementById('bulkList');
             const count = document.getElementById('bulkCount');
-            
-            if (bulkItems.length === 0) {
-                container.classList.add('hidden');
-                return;
-            }
-            
+            if (bulkItems.length === 0) { container.classList.add('hidden'); return; }
             container.classList.remove('hidden');
             count.innerText = bulkItems.length;
-
             list.innerHTML = bulkItems.map((item, index) => `
                 <div class="bg-white rounded-[20px] p-4 shadow-sm border border-slate-100 flex items-center gap-4 animate-[fadeSlideUp_0.3s_ease-out]">
                     <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center shrink-0">
@@ -686,113 +626,61 @@
                     </div>
                     <div class="flex flex-col items-end gap-2 shrink-0">
                         <span class="text-lg font-black text-red-600 leading-none">${item.qty}<span class="text-[10px] text-slate-400 ml-0.5">pcs</span></span>
-                        <button type="button" onclick="removeBulkItem(${index})" class="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-1 rounded-lg active:scale-95">Hapus</button>
+                        <button type="button" onclick="removeBulkItem(${index})" class="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-1 rounded-lg">Hapus</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function removeBulkItem(index) {
-            bulkItems.splice(index, 1);
-            renderBulkItems();
-        }
+        function removeBulkItem(index) { bulkItems.splice(index, 1); renderBulkItems(); }
 
         async function submitBulkData() {
             if(bulkItems.length === 0) return;
-
             const totalItems = bulkItems.length;
-
             Swal.fire({
-                html: `
-                    <div class="flex flex-col items-center p-4">
-                        <div class="w-12 h-12 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin mb-4"></div>
-                        <h3 class="text-lg font-black text-slate-800">Menyimpan Transaksi</h3>
-                        <p id="bulkProgressText" class="text-xs font-bold text-slate-500 mt-1">1 dari ${totalItems} data...</p>
-                    </div>
-                `,
-                showConfirmButton: false, 
-                allowOutsideClick: false,
-                customClass: { popup: 'rounded-3xl shadow-2xl' }
+                html: `<div class="flex flex-col items-center p-4"><div class="w-12 h-12 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin mb-4"></div><h3 class="text-lg font-black text-slate-800">Menyimpan Transaksi</h3><p id="bulkProgressText" class="text-xs font-bold text-slate-500 mt-1">1 dari ${totalItems} data...</p></div>`,
+                showConfirmButton: false, allowOutsideClick: false, customClass: { popup: 'rounded-3xl shadow-2xl' }
             });
-
             let successCount = 0;
-            
             for(let i = 0; i < totalItems; i++) {
                 document.getElementById('bulkProgressText').innerText = `${i + 1} dari ${totalItems} data...`;
                 const payload = { ...bulkItems[i], action: 'submitForm' };
-
                 try {
                     const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-                    
-                    if (response.ok) {
-                        successCount++;
-                    } else {
-                        try {
-                            const res = await response.json();
-                            if(res.status === 'success') successCount++;
-                        } catch(e) {
-                            console.warn("Bukan format JSON dari GAS", e);
-                        }
-                    }
-                } catch (e) {
-                    console.error("Gagal", e);
-                }
-                
-                if (i < totalItems - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                }
+                    if (response.ok) { successCount++; }
+                } catch (e) { console.error("Gagal", e); }
+                if (i < totalItems - 1) { await new Promise(resolve => setTimeout(resolve, 1000)); }
             }
-
             if (successCount > 0) {
-                Swal.fire({
-                    icon: 'success', 
-                    title: 'Transaksi Sukses!', 
-                    confirmButtonColor: '#dc2626', 
-                    customClass: { popup: 'rounded-3xl shadow-2xl', confirmButton: 'rounded-xl font-bold' }
-                });
-                
+                Swal.fire({ icon: 'success', title: 'Transaksi Sukses!', confirmButtonColor: '#dc2626' });
                 document.getElementById('returForm').reset();
                 bulkItems = [];
                 renderBulkItems();
                 refreshHistory();
-                
-                // Set ulang tanggal ke hari ini
                 document.getElementById('tanggalInput').value = new Date().toISOString().split('T')[0];
             } else {
-                Swal.fire('Gagal!', 'Tidak ada data yang berhasil disimpan. Periksa koneksi Anda.', 'error');
+                Swal.fire('Gagal!', 'Tidak ada data yang disimpan.', 'error');
             }
         }
 
-        // ==========================================
-        // SINGLE EDIT & HISTORY
-        // ==========================================
-
         function submitSingleEdit(data) {
-            Swal.fire({
-                html: '<div class="flex flex-col items-center p-4"><div class="w-12 h-12 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin mb-4"></div><h3 class="text-lg font-black text-slate-800">Update Data...</h3></div>',
-                showConfirmButton: false, allowOutsideClick: false, customClass: { popup: 'rounded-3xl' }
-            });
-
+            Swal.fire({ html: '<div class="flex flex-col items-center p-4"><div class="w-12 h-12 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin mb-4"></div><h3 class="text-lg font-black text-slate-800">Update Data...</h3></div>', showConfirmButton: false, allowOutsideClick: false });
             const payload = { ...data, action: 'updateForm', rowIndex: currentEditRowIndex };
-
             fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
             .then(r => r.json())
             .then(res => {
                 if(res.status === 'success') {
-                    Swal.fire({ icon: 'success', title: 'Updated!', timer: 1500, showConfirmButton: false, customClass: { popup: 'rounded-3xl' } });
+                    Swal.fire({ icon: 'success', title: 'Updated!', timer: 1500, showConfirmButton: false });
                     resetEditMode();
                     refreshHistory();
                     switchTab('display');
-                } else {
-                    Swal.fire('Error', res.message, 'error');
-                }
+                } else { Swal.fire('Error', res.message, 'error'); }
             });
         }
 
         function editData(idx) {
             const r = rawHistoryData.find(x => x.rowIndex === idx);
             if(!r) return;
-
             document.querySelector('input[name="tanggal"]').value = r.tanggal;
             document.querySelector('input[name="noPol"]').value = r.noPol;
             document.getElementById('storeSearch').value = r.kodeToko;
@@ -804,15 +692,12 @@
             document.getElementById('ketInput').value = (r.ket || '').toUpperCase();
             document.getElementById('fakturCheckbox').checked = (r.faktur === true || r.faktur === 'ADA FAKTUR');
             document.querySelector('textarea[name="notes"]').value = r.notes || '';
-
             currentEditRowIndex = idx;
             document.getElementById('formTitle').innerText = "Edit Riwayat";
             document.getElementById('cancelEditBtn').classList.remove('hidden');
-            
             const mainBtn = document.getElementById('mainActionBtn');
             mainBtn.innerHTML = '<i class="ph-bold ph-pencil-simple text-xl"></i> Simpan Perubahan';
             mainBtn.classList.replace('bg-slate-900', 'bg-amber-500');
-
             document.getElementById('bulkContainer').classList.add('hidden');
             switchTab('input');
         }
@@ -820,14 +705,12 @@
         function resetEditMode() {
             currentEditRowIndex = null;
             document.getElementById('returForm').reset();
-            document.getElementById('tanggalInput').value = new Date().toISOString().split('T')[0]; // Set ulang tanggal
+            document.getElementById('tanggalInput').value = new Date().toISOString().split('T')[0];
             document.getElementById('formTitle').innerText = "Form Laporan";
             document.getElementById('cancelEditBtn').classList.add('hidden');
-            
             const mainBtn = document.getElementById('mainActionBtn');
             mainBtn.innerHTML = '<i class="ph-bold ph-plus-circle text-xl"></i> Tambah ke Keranjang';
             mainBtn.classList.replace('bg-amber-500', 'bg-slate-900');
-
             renderBulkItems();
         }
 
@@ -842,17 +725,12 @@
                 });
         }
 
-        // Tampilan Card History ala Riwayat OVO/Gopay
         function renderHistoryList(data) {
             const list = document.getElementById('mobileHistoryList');
             if (!data.length) {
-                list.innerHTML = `<div class="text-center py-20 text-slate-300">
-                                    <i class="ph-bold ph-receipt text-5xl mb-2"></i>
-                                    <p class="text-sm font-bold">Belum ada transaksi</p>
-                                  </div>`;
+                list.innerHTML = `<div class="text-center py-20 text-slate-300"><i class="ph-bold ph-receipt text-5xl mb-2"></i><p class="text-sm font-bold">Belum ada transaksi</p></div>`;
                 return;
             }
-
             list.innerHTML = data.slice(0, 30).map(row => `
                 <div class="app-card p-4 flex items-center gap-4 active:scale-[0.98] transition-transform" onclick="editData(${row.rowIndex})">
                     <div class="w-12 h-12 rounded-[16px] bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
@@ -860,8 +738,8 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
-                            <h4 class="text-[13px] font-black text-slate-800 truncate">${row.namaToko}</h4>
-                            <span class="text-[8px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">${row.kodeToko}</span>
+                            <h4 class="text-[13px] font-black text-slate-800 truncate">${row.namaToko || '(Tanpa Toko)'}</h4>
+                            <span class="text-[8px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">${row.kodeToko || '-'}</span>
                         </div>
                         <p class="text-[11px] font-bold text-slate-500 truncate">${row.deskripsi}</p>
                         <p class="text-[9px] font-medium text-slate-400 mt-1">${row.tanggalTampil} • ${row.noPol}</p>
@@ -876,19 +754,15 @@
 
         document.getElementById('liveSearchInput').oninput = (e) => {
             const term = e.target.value.toLowerCase();
-            const filtered = rawHistoryData.filter(r => 
-                (r.noPol + r.deskripsi + r.namaToko + r.kodeToko).toLowerCase().includes(term)
-            );
+            const filtered = rawHistoryData.filter(r => (r.noPol + r.deskripsi + (r.namaToko||'') + (r.kodeToko||'')).toLowerCase().includes(term));
             renderHistoryList(filtered);
         };
 
         function buildDashboard(data) {
             if(!data.length) return;
-            
             document.getElementById('stat-total').innerText = data.length;
             document.getElementById('stat-qty').innerText = data.reduce((acc, r) => acc + (Number(r.qty) || 0), 0);
 
-            // Armada Chart
             const armadas = {};
             data.forEach(r => armadas[r.noPol] = (armadas[r.noPol] || 0) + (Number(r.qty) || 0));
             const topArmada = Object.entries(armadas).sort((a,b) => b[1]-a[1]).slice(0,5);
@@ -910,7 +784,6 @@
                 }
             });
 
-            // Suhu Chart
             const suhus = {};
             data.forEach(r => suhus[r.kategori] = (suhus[r.kategori] || 0) + 1);
 
